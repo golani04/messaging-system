@@ -1,8 +1,15 @@
 from flask import Flask
+from .config import Config
+from .database import DB
 
 
-def create_app():
+db = DB()
+
+
+def create_app(config_obj=Config):
     app = Flask(__name__)
-    app.config.from_pyfile("config.py")
+    app.config.from_object(config_obj)
+    db.init_app(app)
+    print(db.conn)
 
     return app
