@@ -5,8 +5,9 @@ def test_user():
     user = User(1, "Leon", "test@test.com", "password")
     assert user is not None
     assert user.name == "Leon"
-    # TODO: when jwt will be introduced check that password encrypted
-    assert user.password == "password"
+    # checking that password is encrepted
+    assert user.password != "password"
+    assert user.verify_passw("password", user.password)
 
 
 def test_get_user_messages(app):
