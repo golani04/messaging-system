@@ -3,10 +3,10 @@ from backend.models.messages import Message
 
 
 def test_msg(app):
-    msg = Message(1, "Test", "Test...")
+    msg = Message("Test", "Test...", 1)
 
-    assert msg.id == 1
-    assert msg.created_at is not None
+    assert msg.id == 0
+    assert msg.created_at is None
     assert msg.is_read is False
 
 
