@@ -1,6 +1,7 @@
 from dataclasses import is_dataclass
 
 import pytest
+from backend import db
 from backend.models import validate
 from backend.models.messages import Message
 
@@ -54,6 +55,25 @@ def test_message_find_by_id_fails(app):
 
 
 def test_message_delete(app):
-    msg = Message.find_by_id(1)
+    msg_id = 1
+    msg = Message.find_by_id(msg_id)
     assert msg is not None
-    assert msg.delete() is not None
+
+    # let's check that message is exists in mapper table
+    (no_msg_refs, *_) = db.cursor.execute(
+        "select COUNT(*) from UserMessages where m_id = ?", (msg_id,)
+    ).fetchone()
+    assert no_msg_refs == 1
+    assert msg.delete() == 1
+
+    # check if deleted message also was removed from mapper table
+    (no_msg_refs, *_) = db.cursor.execute(
+        "select COUNT(*) from UserMessages where m_id = ?", (msg_id,)
+    ).fetchone()
+    assert no_msg_refs == 0
+
+    (user_exists, *_) = db.cursor.execute(
+        "select COUNT(*) from Users where id = ?", (msg.owner,)
+    ).fetchone()
+    # user was not affected by deleting his message
+    assert user_exists == 1

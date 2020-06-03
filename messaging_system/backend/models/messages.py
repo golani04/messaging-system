@@ -74,5 +74,6 @@ class Message:
         else:
             raise validate.ValidationError("Add a new message is failed")
 
-    def delete(self) -> Optional["Message"]:
+    def delete(self) -> int:
         """Delete function shoud invoke delete on db global class to remove self instance"""
+        return db.delete(self.__tablename__, self.id)
