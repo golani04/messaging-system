@@ -71,9 +71,11 @@ class Message:
             return None
 
         message = dict(zip(cls.__columns__, message))
+        # NOTE: side effect read should not update element
+        # TODO: create a separate method to do updates
         if not message["is_read"]:
             message["is_read"] = True
-            db.update(cls.__tablename__, {"is_read": True})
+            db.update(cls.__tablename__, message["id"], {"is_read": True})
         return cls(**message)
 
     def create(self) -> Union["Message", str]:
@@ -100,3 +102,6 @@ class Message:
         # TODO: iclude owner as User object and not only an id
 
         return data
+
+    def save(self):
+        db.conn.commit()

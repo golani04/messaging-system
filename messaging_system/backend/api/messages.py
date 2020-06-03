@@ -39,8 +39,10 @@ def create_new_message():
         with db.conn:
             message.create()
             mapper.create_ref(message, recipient)
+
+        message.save()
     except validate.ValidationError as err:
-        return errors.bad_request(err)
+        return errors.bad_request(err.messages)
 
     return jsonify(message.to_json()), 201
 
@@ -55,6 +57,9 @@ def get_messages():
 @bp.route("/messages/<int:m_id>", methods=["GET"])
 @check_item_exists
 def get_message(result: Message):
+    # NOTE: this api will also set is_read to True as a side effect
+    # TODO: consider different approach
+    result.save()
     return jsonify(result.to_json())
 
 
@@ -62,6 +67,7 @@ def get_message(result: Message):
 @check_item_exists
 def delete_message(result: Message):
     if result.delete():
+        result.save()
         return jsonify(), 204
 
     return errors.bad_request(f"Deleting item `{result.id}` was not successful.")
