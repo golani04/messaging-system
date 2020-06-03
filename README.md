@@ -26,10 +26,10 @@
   - [x] POST /messages JSON{sender, recipient, subject, body}
 - Show messages for a specific user
   - [x] GET /messages?user\_id=\<id>
-  - [ ] GET /users/<user\_id>/messages
+  - [x] GET /users/<user\_id>/messages
 - Show unread messages for a specific user
   - [x] GET /messages?user\_id=\<id>&unread=1
-  - [ ] GET /users/<user\_id>/messages?unread=1
+  - [x] GET /users/<user\_id>/messages?unread=1
 - Read a message
   - [x] GET /messages/<m\_id>
 - Delete a message
