@@ -68,8 +68,8 @@ class DB:
 
     def delete(self, tblname: str, id: int = None):
         # NOTE: if id is empty it will remove all items in table
-        # NOTE: SQL does on delete cascade, but it should be considered carefully because once deleted
-        #       it's hard to restore if at all
+        # NOTE: SQL does on delete cascade, but it should be considered carefully
+        #       because once deleted it's hard to restore if at all
         stmt = "DELETE FROM {} {}".format(tblname, ("WHERE id=?" if id is not None else ""))
         return self.cursor.execute(stmt, (id,)).rowcount
 
