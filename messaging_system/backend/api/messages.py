@@ -29,3 +29,10 @@ def create_new_message():
         return errors.bad_request(err)
 
     return jsonify(message.to_json())
+
+
+@bp.route("/messages", methods=["GET"])
+def get_messages():
+    result = Message.filter_by(request.args)
+
+    return jsonify([item.to_json() for item in result])
