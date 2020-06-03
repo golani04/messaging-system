@@ -10,15 +10,15 @@
 
 ### Mapper
 
-|m_id   |s_id   |r_id   |
-|-------|-------|-------|
-|int(fk)|int(fk)|int(fk)|
+|m_id   |r_id   |
+|-------|-------|
+|int(fk)|int(fk)|
 
 ### Messsages
 
-|id |subject|body   |created_at|is_read|
-|---|-------|-------|----------|-------|
-|int|varchar|text   |date      |bool   |
+|id |subject|body   |created_at|is_read|owner |
+|---|-------|-------|----------|-------|------|
+|int|varchar|text   |date      |bool   |int   |
 
 ## API
 
