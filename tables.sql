@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Messages;
 DROP TABLE IF EXISTS UserMessages;
 
-CREATE TABLE Users (id INTEGER Primary KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);
+CREATE TABLE Users (id INTEGER Primary KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL);
 INSERT INTO Users (name, email, password) VALUES 
     ('Jane', 'janedoe@test.com', '$2b$12$yQ7bf11kk6W/Kca1D3H2tuvfCyJ.YihiPOANNmQGCE3ZJ8WeJpgDG'),
     ('John', 'johndoe@test.com', '$2b$12$OHjqXpmqsYCSvVCJYmaTtejrggRYMUOx3kZfT7HJHSnDleQK.6olC'),
