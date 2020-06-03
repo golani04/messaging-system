@@ -56,3 +56,12 @@ def get_messages():
 @check_item_exists
 def get_message(result: Message):
     return jsonify(result.to_json())
+
+
+@bp.route("/messages/<int:m_id>", methods=["DELETE"])
+@check_item_exists
+def delete_message(result: Message):
+    if result.delete():
+        return jsonify(), 204
+
+    return errors.bad_request(f"Deleting item `{result.id}` was not successful.")

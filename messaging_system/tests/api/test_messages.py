@@ -46,3 +46,8 @@ def test_find_by_id_missing(app):
 
     assert response.status_code == 404
     assert response.get_json()["message"] == "Searched message: 100000001 is not exists."
+
+
+def test_delete_message(app):
+    response = app.delete("/api/messages/1")
+    assert response.status_code == 204
