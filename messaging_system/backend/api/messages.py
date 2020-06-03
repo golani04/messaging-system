@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import jsonify, request
 
 from backend import db
@@ -5,6 +6,19 @@ from backend.models import mapper, validate
 from backend.models.messages import Message
 
 from . import bp, errors
+
+
+def check_item_exists(f):
+    @wraps(f)
+    def wrapper(m_id: int):
+        message = Message.find_by_id(m_id)
+
+        if message is None:
+            return errors.not_found(f"Searched message: {m_id} is not exists.")
+
+        return f(message)
+
+    return wrapper
 
 
 @bp.route("/messages", methods=["POST"])
@@ -39,10 +53,6 @@ def get_messages():
 
 
 @bp.route("/messages/<int:m_id>", methods=["GET"])
-def get_message(m_id: int):
-    result = Message.find_by_id(m_id)
-
-    if result is None:
-        return errors.not_found(f"Searched message: {m_id} is not exists.")
-
+@check_item_exists
+def get_message(result: Message):
     return jsonify(result.to_json())
