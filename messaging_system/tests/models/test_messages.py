@@ -1,3 +1,5 @@
+from dataclasses import is_dataclass
+
 import pytest
 from backend.models.messages import Message
 
@@ -26,7 +28,13 @@ def test_message_create(app):
 
 def test_message_find_by_id(app):
     msg = Message.find_by_id(1)
-    assert msg is not None
+    assert is_dataclass(msg)
+
+
+def test_message_find_by_id_fails(app):
+    non_exist_msg = 10001
+
+    assert Message.find_by_id(non_exist_msg) is None
 
 
 def test_message_delete(app):

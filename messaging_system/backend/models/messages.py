@@ -56,8 +56,13 @@ class Message:
         ).fetchall()
 
     @classmethod
-    def find_by_id(self, id: str) -> Optional["Message"]:
+    def find_by_id(cls, id: str) -> Optional["Message"]:
         """Use filter_by to find message."""
+
+        message = db.filter_by(cls.__tablename__, {"id": id}).fetchone()
+        if message is None:
+            return None
+        return cls(**dict(zip(cls.__columns__, message)))
 
     def delete(self) -> Optional["Message"]:
         """Delete function shoud invoke delete on db global class to remove self instance"""
