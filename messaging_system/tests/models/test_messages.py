@@ -1,6 +1,7 @@
 from dataclasses import is_dataclass
 
 import pytest
+from backend.models import validate
 from backend.models.messages import Message
 
 
@@ -23,7 +24,22 @@ def test_message_filter_by(params, expected, app):
 
 
 def test_message_create(app):
-    assert Message.create({"subject": "Test", "body": "Testing..."}) is not None
+    msg = Message(**{"subject": "Test", "body": "Testing...", "owner": 1})
+    msg.create()
+
+    assert is_dataclass(msg)
+
+
+def test_message_create_fails(app):
+    # owner is not exist
+    non_exist_owner = 10001
+    msg = Message(**{"subject": "Test", "body": "Testing...", "owner": non_exist_owner})
+
+    with pytest.raises(validate.ValidationError) as excinfo:
+        msg.create()
+
+    assert is_dataclass(msg)
+    assert str(excinfo.value) == "Add a new message is failed"
 
 
 def test_message_find_by_id(app):

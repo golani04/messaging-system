@@ -1,7 +1,8 @@
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from time import time
 
-from typing import Any, ClassVar, Dict, Optional
+from typing import Any, ClassVar, Dict, Optional, Union
 
 from backend import db
 from . import validate
@@ -40,11 +41,6 @@ class Message:
         validate.is_datetime(data.get("created_at"))
 
     @classmethod
-    def create(cls, data) -> "Message":
-        """Create a new message using db class"""
-        # TODO: sender and recipient can not be the same
-
-    @classmethod
     def filter_by(cls, params: Dict[str, Any] = None) -> Optional["Message"]:
         """Return messages based on prams, if params is None return all messages."""
 
@@ -63,6 +59,20 @@ class Message:
         if message is None:
             return None
         return cls(**dict(zip(cls.__columns__, message)))
+
+    def create(self) -> Union["Message", str]:
+        """Create a new message using db class"""
+        data = {**asdict(self), "created_at": int(time()), "is_read": int(False)}
+
+        # remove id
+        data.pop("id", None)
+        self.id = db.insert(Message.__tablename__, data)
+
+        if self.id > 0:
+            self.created_at = data["created_at"]
+            self.is_read = data["is_read"]
+        else:
+            raise validate.ValidationError("Add a new message is failed")
 
     def delete(self) -> Optional["Message"]:
         """Delete function shoud invoke delete on db global class to remove self instance"""
