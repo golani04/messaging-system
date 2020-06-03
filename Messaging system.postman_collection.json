@@ -324,6 +324,115 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "all_messages",
+					"item": [
+						{
+							"name": "Get messages via user",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/users/1/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"1",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get messages via user with query",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/users/1/messages?is_read=0",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"1",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "is_read",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get messages via user with query plus recipient",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/users/1/messages?is_read=0&recipient=2",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"1",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "is_read",
+											"value": "0"
+										},
+										{
+											"key": "recipient",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get messages via non existing user",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/users/100012165/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"100012165",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -350,7 +459,7 @@
 	],
 	"variable": [
 		{
-			"id": "f4b7bbfe-55b7-4fad-a8e3-4ed275400c7a",
+			"id": "b57dffc8-fbf1-4a9e-9e72-b25843568856",
 			"key": "url",
 			"value": "http://localhost:5000",
 			"type": "string"
