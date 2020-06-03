@@ -10,9 +10,14 @@ def test_msg(app):
     assert msg.is_read is False
 
 
-@pytest.mark.parametrize("params", [None, {"user_id": 1}, {"user_id": 1, "is_read": False}])
-def test_filter_by_user_id(params, app):
-    assert Message.filter_by(params) is not None
+@pytest.mark.parametrize(
+    "params, expected", [(None, 5), ({"recipient": 1}, 2), ({"recipient": 1, "is_read": False}, 1)]
+)
+def test_message_filter_by(params, expected, app):
+    result = Message.filter_by(params)
+
+    assert result is not None
+    assert len(result) == expected
 
 
 def test_message_create(app):

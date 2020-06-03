@@ -3,6 +3,7 @@ from datetime import datetime
 
 from typing import Any, ClassVar, Dict, Optional
 
+from backend import db
 from . import validate
 
 
@@ -38,9 +39,6 @@ class Message:
         validate.is_numeric([v for k, v in data.items() if k in {"id", "owner"}])
         validate.is_datetime(data.get("created_at"))
 
-    def get_all(self):
-        """Return all messages"""
-
     @classmethod
     def create(cls, data) -> "Message":
         """Create a new message using db class"""
@@ -49,6 +47,13 @@ class Message:
     @classmethod
     def filter_by(cls, params: Dict[str, Any] = None) -> Optional["Message"]:
         """Return messages based on prams, if params is None return all messages."""
+
+        if params is None:
+            return db.filter_by(cls.__tablename__, {}).fetchall()
+
+        return db.filter_by(
+            cls.__tablename__, params, "UserMessages", ("r_id", "recipient", "m_id")
+        ).fetchall()
 
     @classmethod
     def find_by_id(self, id: str) -> Optional["Message"]:
