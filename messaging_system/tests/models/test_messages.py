@@ -24,6 +24,13 @@ def test_message_filter_by(params, expected, app):
     assert len(result) == expected
 
 
+@pytest.mark.parametrize(
+    "params, expected", [({"non_existing": 10001}, []), ({"recipient": 1001}, [])]
+)
+def test_message_filter_by_fails(params, expected, app):
+    assert Message.filter_by(params) == expected
+
+
 def test_message_create(app):
     msg = Message(**{"subject": "Test", "body": "Testing...", "owner": 1})
     msg.create()
@@ -44,8 +51,12 @@ def test_message_create_fails(app):
 
 
 def test_message_find_by_id(app):
-    msg = Message.find_by_id(1)
+    is_read, *_ = db.cursor.execute("SELECT is_read FROM Messages where id = 4").fetchone()
+    assert is_read == 0
+
+    msg = Message.find_by_id(4)
     assert is_dataclass(msg)
+    assert msg.is_read
 
 
 def test_message_find_by_id_fails(app):

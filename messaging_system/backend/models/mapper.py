@@ -1,13 +1,21 @@
-from dataclasses import dataclass
-from typing import List
+from backend import db
 
-from .messages import Message
+from . import messages, validate
+
+__tablename__ = "UserMessages"
 
 
-@dataclass
-class Mapper:
-    m_id: int
-    r_id: int
+def create_ref(message: messages.Message, recipient: int) -> id:
+    """Create reference between message and recipient."""
 
-    def get_messages_by_recipient(self, is_read: bool = None) -> List[Message]:
-        """Join 2 tables by r_id == Users.id and m_id == Messages.id"""
+    if message.owner == recipient:
+        raise validate.ValidationError("Recipient and owner can not be same person")
+
+    rowid = db.insert(__tablename__, {"r_id": recipient, "m_id": message.id})
+
+    if rowid > 0:
+        return rowid
+
+    # m_id should be always correct,
+    # Message.create will catch an error and throw a validation error before this called
+    raise validate.ValidationError("Recipient is not exits.")

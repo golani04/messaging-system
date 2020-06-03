@@ -1,8 +1,8 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime
 from time import time
 
-from typing import Any, ClassVar, Dict, Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional, Union
 
 from backend import db
 from . import validate
@@ -22,6 +22,7 @@ class Message:
     def __post_init__(self):
         self._validate(asdict(self))
         self.created_at = self.convert_to_timestamp(self.created_at)
+        self.is_read = bool(self.is_read)
 
     @staticmethod
     def convert_to_timestamp(dt):
@@ -41,15 +42,25 @@ class Message:
         validate.is_datetime(data.get("created_at"))
 
     @classmethod
-    def filter_by(cls, params: Dict[str, Any] = None) -> Optional["Message"]:
+    def filter_by(cls, params: Dict[str, Any] = None) -> List["Message"]:
         """Return messages based on prams, if params is None return all messages."""
 
-        if params is None:
-            return db.filter_by(cls.__tablename__, {}).fetchall()
+        class_fields = {field_.name for field_ in fields(cls)}
+        mapper_fields = ("r_id", "recipient", "m_id")
 
-        return db.filter_by(
-            cls.__tablename__, params, "UserMessages", ("r_id", "recipient", "m_id")
-        ).fetchall()
+        if params and (set(params) - class_fields.union(mapper_fields)):
+            # NOTE: if someone send non existing field, better to return empty, never know
+            #       whose trying to harm our application
+            return []
+
+        if not params:
+            result = db.filter_by(cls.__tablename__, {}).fetchall()
+        else:
+            result = db.filter_by(
+                cls.__tablename__, params, "UserMessages", mapper_fields
+            ).fetchall()
+
+        return [cls(**dict(zip(cls.__columns__, item))) for item in result]
 
     @classmethod
     def find_by_id(cls, id: str) -> Optional["Message"]:
@@ -58,7 +69,12 @@ class Message:
         message = db.filter_by(cls.__tablename__, {"id": id}).fetchone()
         if message is None:
             return None
-        return cls(**dict(zip(cls.__columns__, message)))
+
+        message = dict(zip(cls.__columns__, message))
+        if not message["is_read"]:
+            message["is_read"] = True
+            db.update(cls.__tablename__, {"is_read": True})
+        return cls(**message)
 
     def create(self) -> Union["Message", str]:
         """Create a new message using db class"""
@@ -77,3 +93,10 @@ class Message:
     def delete(self) -> int:
         """Delete function shoud invoke delete on db global class to remove self instance"""
         return db.delete(self.__tablename__, self.id)
+
+    def to_json(self):
+        data = asdict(self)
+        data["created_at"] = datetime.utcfromtimestamp(self.created_at)
+        # TODO: iclude owner as User object and not only an id
+
+        return data
