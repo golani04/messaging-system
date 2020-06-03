@@ -36,3 +36,13 @@ def get_messages():
     result = Message.filter_by(request.args)
 
     return jsonify([item.to_json() for item in result])
+
+
+@bp.route("/messages/<int:m_id>", methods=["GET"])
+def get_message(m_id: int):
+    result = Message.find_by_id(m_id)
+
+    if result is None:
+        return errors.not_found(f"Searched message: {m_id} is not exists.")
+
+    return jsonify(result.to_json())
