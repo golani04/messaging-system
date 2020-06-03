@@ -22,6 +22,7 @@ class Message:
     def __post_init__(self):
         self._validate(asdict(self))
         self.created_at = self.convert_to_timestamp(self.created_at)
+        self.is_read = bool(self.is_read)
 
     @staticmethod
     def convert_to_timestamp(dt):
@@ -77,3 +78,10 @@ class Message:
     def delete(self) -> int:
         """Delete function shoud invoke delete on db global class to remove self instance"""
         return db.delete(self.__tablename__, self.id)
+
+    def to_json(self):
+        data = asdict(self)
+        data["created_at"] = datetime.utcfromtimestamp(self.created_at)
+        # TODO: iclude owner as User object and not only an id
+
+        return data
