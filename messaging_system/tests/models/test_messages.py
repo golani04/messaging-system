@@ -24,6 +24,13 @@ def test_message_filter_by(params, expected, app):
     assert len(result) == expected
 
 
+@pytest.mark.parametrize(
+    "params, expected", [({"non_existing": 10001}, []), ({"recipient": 1001}, [])]
+)
+def test_message_filter_by_fails(params, expected, app):
+    assert Message.filter_by(params) == expected
+
+
 def test_message_create(app):
     msg = Message(**{"subject": "Test", "body": "Testing...", "owner": 1})
     msg.create()
