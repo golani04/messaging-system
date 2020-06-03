@@ -47,7 +47,7 @@ class DB:
             self.init_app(app)
 
     def init_app(self, app):
-        self.conn = sqlite3.connect(app.config["DATABASE_URL"])
+        self.conn = sqlite3.connect(app.config["DATABASE_URL"], check_same_thread=False)
         self.cursor = self.conn.cursor()
 
     def insert(self, tblname: str, data: Dict) -> bool:
