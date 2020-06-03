@@ -46,6 +46,7 @@ class Message:
         """Return messages based on prams, if params is None return all messages."""
 
         class_fields = {field_.name for field_ in fields(cls)}
+        # recipient is a key in params, other values is keys in mapper table
         mapper_fields = ("r_id", "recipient", "m_id")
 
         if params and (set(params) - class_fields.union(mapper_fields)):
