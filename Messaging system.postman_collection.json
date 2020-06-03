@@ -1,0 +1,360 @@
+{
+	"info": {
+		"_postman_id": "493bbffd-852a-472c-bcad-a232a6f46e72",
+		"name": "Messaging system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "messages",
+			"item": [
+				{
+					"name": "all",
+					"item": [
+						{
+							"name": "Return all messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								},
+								"description": "if query string is empty. Request will return all messages"
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "filter_by",
+					"item": [
+						{
+							"name": "Return user's all messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages?recipient=2",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "recipient",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return empty by non existing user",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages?recipient=2000000001",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "recipient",
+											"value": "2000000001"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return user's unread messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages?recipient=2&is_read=0",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "recipient",
+											"value": "2"
+										},
+										{
+											"key": "is_read",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "get_specific",
+					"item": [
+						{
+							"name": "Return specific message",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages/5",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return 404",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages/50000001",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"50000001"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "new_message",
+					"item": [
+						{
+							"name": "Create a new message",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"subject\": \"Create a message via Postman\",\n\t\"body\": \"In order to test using Postman\",\n\t\"owner\": 3,\n\t\"recipient\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a new message missing fields",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"subject\": \"Create a message via Postman\",\n\t\"owner\": 3\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a new message non existing owner",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"subject\": \"Create a message via Postman\",\n\t\"body\": \"In order to test using Postman\",\n\t\"owner\": 30000546,\n\t\"recipient\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a new message non existing recipient",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"subject\": \"Create a message via Postman\",\n\t\"body\": \"In order to test using Postman\",\n\t\"recipient\": 30000546,\n\t\"owner\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/messages",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "delete_message",
+					"item": [
+						{
+							"name": "Delete a message by its id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages/1",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a message by its non existing id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/messages/1004156464516",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"1004156464516"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f11b952d-3a0e-4eac-8875-a556466397b3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cb1228cc-9e2a-48a3-84fb-f935cb9bcd05",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "f4b7bbfe-55b7-4fad-a8e3-4ed275400c7a",
+			"key": "url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
