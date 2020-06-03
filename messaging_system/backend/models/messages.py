@@ -69,7 +69,12 @@ class Message:
         message = db.filter_by(cls.__tablename__, {"id": id}).fetchone()
         if message is None:
             return None
-        return cls(**dict(zip(cls.__columns__, message)))
+
+        message = dict(zip(cls.__columns__, message))
+        if not message["is_read"]:
+            message["is_read"] = True
+            db.update(cls.__tablename__, {"is_read": True})
+        return cls(**message)
 
     def create(self) -> Union["Message", str]:
         """Create a new message using db class"""

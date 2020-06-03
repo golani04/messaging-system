@@ -66,6 +66,15 @@ class DB:
 
         return 0
 
+    def update(self, tblname, data: Dict):
+        placeholders = ", ".join(["{key}=:{key}".format(key=k) for k in data])
+        stmt = "UPDATE {} set {}".format(tblname, placeholders)
+        try:
+            return self.cursor.execute(stmt, data).lastrowid
+        except (sqlite3.IntegrityError, sqlite3.ProgrammingError, sqlite3.OperationalError):
+            # TODO: log error message
+            self.conn.rollback()
+
     def delete(self, tblname: str, id: int = None):
         # NOTE: if id is empty it will remove all items in table
         # NOTE: SQL does on delete cascade, but it should be considered carefully
