@@ -28,7 +28,7 @@ def create_new_message():
     except validate.ValidationError as err:
         return errors.bad_request(err)
 
-    return jsonify(message.to_json())
+    return jsonify(message.to_json()), 201
 
 
 @bp.route("/messages", methods=["GET"])
