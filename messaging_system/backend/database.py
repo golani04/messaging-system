@@ -48,6 +48,7 @@ class DB:
 
     def init_app(self, app):
         self.conn = sqlite3.connect(app.config["DATABASE_URL"], check_same_thread=False)
+        self.conn.execute("PRAGMA foreign_keys = 1")
         self.cursor = self.conn.cursor()
 
     def insert(self, tblname: str, data: Dict) -> bool:

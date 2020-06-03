@@ -2,8 +2,6 @@ DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Messages;
 DROP TABLE IF EXISTS UserMessages;
 
-PRAGMA foreign_keys = 1;
-
 CREATE TABLE Users (id INTEGER Primary KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);
 INSERT INTO Users (name, email, password) VALUES 
     ('Jane', 'janedoe@test.com', '$2b$12$yQ7bf11kk6W/Kca1D3H2tuvfCyJ.YihiPOANNmQGCE3ZJ8WeJpgDG'),
