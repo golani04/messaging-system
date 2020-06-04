@@ -1,1 +1,1 @@
-web: gunicorn messaging_system.run:app
+web: gunicorn run:app
