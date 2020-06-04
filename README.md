@@ -54,5 +54,8 @@ For this I choose to use gunicorn to serve my app.
   - [x] GET /users/<user\_id>/messages?unread=1
 - Read a message
   - [x] GET /messages/<m\_id>
+  - [x] GET /users/<user\_id>/messages/1
 - Delete a message
   - [x] DELETE /messages/<m\_id>
+
+**NOTE**: All messages are returned by recipient not by owner if recipient provided or user_id.
