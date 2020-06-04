@@ -4,6 +4,17 @@ from functools import wraps
 from typing import Callable, Dict, Tuple
 
 
+def _where_stmt(tblname, params: Dict, join_params: Tuple = ()):
+    named_params_string = " AND ".join(
+        ["{}.{key}=:{key}".format(tblname, key=k) for k in params if k not in join_params]
+    )
+
+    if not named_params_string:
+        return ""
+
+    return "WHERE {}".format(named_params_string)
+
+
 class DB:
     def _join_with_mapper(f):
         @wraps(f)
@@ -14,29 +25,25 @@ class DB:
             mappertbl: str = None,
             mappertbl_keys: Tuple = (),
         ) -> Callable:
-            where_stmt = " and ".join(
-                ["{key}=:{key}".format(key=k) for k in search_params if k not in mappertbl_keys]
-            )
-            stmt = "SELECT * FROM {} {where_stmt};".format(
-                tblname, where_stmt=("where {}".format(where_stmt) if where_stmt else "")
-            )
+            where_stmt = _where_stmt(tblname, search_params, mappertbl_keys)
+            stmt = "SELECT * FROM {} {};".format(tblname, where_stmt)
 
             if mappertbl is not None:
-                # if to add `and` before empty string SQL query will fail
-                additional_filters = "and {}".format(where_stmt) if where_stmt else ""
-
                 stmt = (
                     (
                         "SELECT {maintbl}.* from {maintbl} "
                         "INNER JOIN {jointbl} ON {jointbl}.{} = :{} "
-                        "WHERE {maintbl}.id == {jointbl}.{} {additional_filters};"
+                        "WHERE {maintbl}.id == {jointbl}.{} {where_stmt};"
                     )
                 ).format(
+                    # *args
                     *mappertbl_keys,
+                    # **kwargs
                     maintbl=tblname,
                     jointbl=mappertbl,
-                    additional_filters=additional_filters,
+                    where_stmt=where_stmt.replace("WHERE ", "AND "),
                 )
+
             return f(self, stmt, search_params)
 
         return wrapper
