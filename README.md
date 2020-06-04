@@ -4,12 +4,9 @@
 
 Address [Messaging system](https://polar-brushlands-03833.herokuapp.com/)
 
-For this I choose to use gunicorn to serve my app.
-
-- Install **gunicorn**: `poetry add gunicorn`
-
 ### Requirements
 
+- I chose to us **gunicorn** with heroku
 - runtime.txt: Specify python version
 - Procfile: Call command to up a server
 - requirements.txt: Show which app to install
@@ -48,7 +45,8 @@ For this I choose to use gunicorn to serve my app.
   - [x] POST /auth/login JSON{email, password}
   - [x] GET /api/messages Headers{Authoriazation: Bearer {token}}
 
-**NOTE**: to test logged in users use email: janedoe@test.com or johndoe@test.com, password: password
+**NOTE**: to test logged in users use email: janedoe@test.com or johndoe@test.com, password: password.\
+Postman: Call first /auth/login route it will save token and then call /api/messages route.
 
 - Send a new message
   - [x] POST /api/messages JSON{sender, recipient, subject, body}
