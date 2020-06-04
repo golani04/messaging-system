@@ -475,6 +475,93 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "loggedin",
+			"item": [
+				{
+					"name": "Get messages of logged in user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "31c89f56-e5ad-44b1-92aa-e1d8d81277f5",
+								"exec": [
+									"const payload = pm.response.json();\r",
+									"pm.collectionVariables.set('token', payload.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"janedoe@test.com\",\n\t\"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Return messages of loggedin user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5ddb23d-8f46-4a15-b819-6cc31892a2ad",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/messages",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages"
+							]
+						},
+						"description": "In order to check loagged in user messages, run first login url"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -501,21 +588,27 @@
 	],
 	"variable": [
 		{
-			"id": "dbb1047d-aa64-4ec1-85ce-c59ac8948fcb",
+			"id": "74ac95e4-af99-4d86-a41a-96d99a3b515a",
 			"key": "furl",
 			"value": "http://localhost:5000",
 			"type": "string"
 		},
 		{
-			"id": "31c2752f-a6d0-408e-9d63-36d8dfc9b9ee",
+			"id": "cbe7f5d0-2228-4935-8c53-91017442eb0c",
 			"key": "url",
 			"value": "https://polar-brushlands-03833.herokuapp.com/",
 			"type": "string"
 		},
 		{
-			"id": "e042afd4-8e65-4501-bc6b-dcf483a24284",
+			"id": "91e4065b-4011-410a-93ec-fda0481c0adf",
 			"key": "gurl",
 			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"id": "8af9ccad-150a-47a5-865a-4e3ac60f508a",
+			"key": "token",
+			"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTEyNzc0MzksIm5iZiI6MTU5MTI3NzQzOSwianRpIjoiYmNhM2FkMzktZDFkZS00ZmJmLThhMmQtYTBjNTk0NGM1NjQ1IiwiZXhwIjoxNTkxMjc4MzM5LCJpZGVudGl0eSI6MSwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.h46McH2UFdBiKTVYlTFNMC8_ysq9XJhLfHplquuzLJ4",
 			"type": "string"
 		}
 	],
