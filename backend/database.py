@@ -92,4 +92,5 @@ class DB:
 
     @_join_with_mapper
     def filter_by(self, stmt: str, search_params: Dict) -> sqlite3.Cursor:
+        # TODO: Add order_by in order to be consistent
         return self.cursor.execute(stmt, search_params)
