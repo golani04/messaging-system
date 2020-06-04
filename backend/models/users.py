@@ -26,11 +26,15 @@ class User:
 
         return cls(**dict(zip(cls.__columns__, user)))
 
-    def get_messages(self, params: Dict = None) -> List:
+    def get_messages(self, params: Dict = None, message_id: int = None) -> List:
         """Return all messages related to the user"""
         if params is None:
             params = {}
-        return Message.filter_by({**params, "recipient": self.id})
+
+        params = {**params, "recipient": self.id}
+        if message_id is not None:
+            params["id"] = message_id
+        return Message.filter_by(params)
 
     @staticmethod
     def generate_passw(passw: str) -> str:
