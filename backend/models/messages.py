@@ -50,7 +50,7 @@ class Message:
         mapper_fields = ("r_id", "recipient", "m_id")
 
         if params and (set(params) - class_fields.union(mapper_fields)):
-            # NOTE: if someone send non existing field, better to return empty, never know
+            # NOTE: if someone sends non existing field, better to return empty, never knows
             #       whose trying to harm our application
             return []
 

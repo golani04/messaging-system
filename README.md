@@ -1,5 +1,27 @@
 # Messaging system
 
+## Deployment to Heroku
+
+Address [Messaging system](https://polar-brushlands-03833.herokuapp.com/)
+
+For this I choose to use gunicorn to serve my app.
+
+- Install **gunicorn**: `poetry add gunicorn`
+
+### Requirements
+
+- runtime.txt: Specify python version
+- Procfile: Call command to up a server
+- requirements.txt: Show which app to install
+  - Heroku don't support poetry. Run this command to export it
+
+    ```sh
+    poetry export -f requirements.txt > requirements.txt
+    ```
+
+- `heroku config:set KEY=VALUE` or add in project folder on heroku
+  - Set all environments variables
+
 ## DB
 
 ### Users
