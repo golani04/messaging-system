@@ -10,3 +10,4 @@ db_path = os.path.join(project_path, os.environ.get("DBNAME"))
 
 class Config:
     DATABASE_URL = db_path
+    SECRET_KEY = os.environ.get("SECRET_KEY")

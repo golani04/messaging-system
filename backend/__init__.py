@@ -1,9 +1,12 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
+
 from .config import Config
 from .database import DB
 
 
 db = DB()
+jwt = JWTManager()
 
 
 def create_app(config_obj=Config):
@@ -12,10 +15,13 @@ def create_app(config_obj=Config):
 
     # init packages
     db.init_app(app)
+    jwt.init_app(app)
     # register blueprint
     # app should be instantiated before importing blueprint
     from backend.api import bp as api_bp
+    from backend.auth import bp as auth_bp
 
     app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(auth_bp, url_prefix="/auth")
 
     return app

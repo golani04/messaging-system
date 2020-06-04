@@ -44,18 +44,24 @@ For this I choose to use gunicorn to serve my app.
 
 ## API
 
+- Login
+  - [x] POST /auth/login JSON{email, password}
+  - [x] GET /api/messages Headers{Authoriazation: Bearer {token}}
+
+**NOTE**: to test logged in users use email: janedoe@test.com or johndoe@test.com, password: password
+
 - Send a new message
-  - [x] POST /messages JSON{sender, recipient, subject, body}
+  - [x] POST /api/messages JSON{sender, recipient, subject, body}
 - Show messages for a specific user
-  - [x] GET /messages?user\_id=\<id>
-  - [x] GET /users/<user\_id>/messages
+  - [x] GET /api/messages?user\_id=\<id>
+  - [x] GET /api/users/<user\_id>/messages
 - Show unread messages for a specific user
-  - [x] GET /messages?user\_id=\<id>&unread=1
-  - [x] GET /users/<user\_id>/messages?unread=1
+  - [x] GET /api/messages?user\_id=\<id>&unread=1
+  - [x] GET /api/users/<user\_id>/messages?unread=1
 - Read a message
-  - [x] GET /messages/<m\_id>
-  - [x] GET /users/<user\_id>/messages/1
+  - [x] GET /api/messages/<m\_id>
+  - [x] GET /api/users/<user\_id>/messages/1
 - Delete a message
-  - [x] DELETE /messages/<m\_id>
+  - [x] DELETE /api/messages/<m\_id>
 
 **NOTE**: All messages are returned by recipient not by owner if recipient provided or user_id.

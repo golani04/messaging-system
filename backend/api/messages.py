@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import jsonify, request
+from flask_jwt_extended import jwt_optional, get_jwt_identity
 
 from backend import db
 from backend.models import mapper, validate
@@ -48,9 +49,15 @@ def create_new_message():
 
 
 @bp.route("/messages", methods=["GET"])
+@jwt_optional
 def get_messages():
-    result = Message.filter_by(request.args)
+    args = request.args
+    user_id = get_jwt_identity()
 
+    if user_id is not None:
+        args = {**args, "recipient": user_id}
+
+    result = Message.filter_by(args)
     return jsonify([item.to_json() for item in result])
 
 

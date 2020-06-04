@@ -1,5 +1,7 @@
 import pytest
 
+from backend.models.messages import Message
+
 
 def test_messages_post(app):
     response = app.post(
@@ -23,6 +25,23 @@ def test_messages_by_args(params, expected, app):
 
     assert response.status_code == 200
     assert len(response.get_json()) == expected
+
+
+def test_messages_by_args_loggedin(app):
+    response = app.post("/auth/login", json={"email": "janedoe@test.com", "password": "password"})
+    access_token = response.get_json()["access_token"]
+
+    assert response.status_code == 200
+    assert access_token is not None
+
+    response = app.get("/api/messages", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+
+    messages_via_api = response.get_json()
+    messages_via_db = Message.filter_by({"recipient": 1})
+
+    assert {item["id"] for item in messages_via_api} == {item.id for item in messages_via_db}
 
 
 @pytest.mark.parametrize("params", [{"recipient": 10001}, {"non-existing-field": 10001}])
