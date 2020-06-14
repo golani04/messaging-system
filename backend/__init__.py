@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 from .config import Config
-from .database import DB
 
 
-db = DB()
+db = SQLAlchemy()
 jwt = JWTManager()
 
 
