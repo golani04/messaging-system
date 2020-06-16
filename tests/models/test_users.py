@@ -1,31 +1,52 @@
-from backend.models.messages import Message
+from typing import Dict, List
+
 from backend.models.users import User
 
 
-def test_user():
-    user = User(1, "Leon", "test@test.com", "password")
-    assert user is not None
-    assert user.name == "Leon"
-    assert user.password == "password"
+_SOME_USER_ID = 1
+_SOME_USER_EMAIL = "janedoe@test.com"
+_SENT_MESSAGES_IDS_BY_SOME_USER = {1}
+_RECEIVED_MESSAGES_IDS_BY_SOME_USER = {2, 5}
+_SOME_USER_PASSWORD = "password"
+
+_SOME_NON_EXISTING_EMAIL = "nonexiting@test.com"
+
+
+def test_some_user_exists(app):
+    assert User.query.get(_SOME_USER_ID) is not None
+
+
+def test_some_user_password(app):
+    user = User.query.get(_SOME_USER_ID)
+
+    assert user.password != _SOME_USER_PASSWORD
+    # same string if generate again shows different hash
+    assert user.password != user.generate_passw(_SOME_USER_PASSWORD)
+
+    # check that some_password and hash that stored are actually the same
+    assert user.verify_passw(_SOME_USER_PASSWORD, user.password)
 
 
 def test_get_user_messages(app):
-    user = User.find_by_id(1)
+    user = User.query.get(_SOME_USER_ID)
+    all_messages: Dict[str, List] = user.get_messages()
+
+    received_message_ids = {message.id for message in all_messages["recieved"]}
+    sent_message_ids = {message.id for message in all_messages["sent"]}
+
+    assert received_message_ids == _RECEIVED_MESSAGES_IDS_BY_SOME_USER
+    assert sent_message_ids == _SENT_MESSAGES_IDS_BY_SOME_USER
+
+
+def test_user_authentication(app):
+    user = User.autenticate(_SOME_USER_EMAIL)
 
     assert user is not None
-    messages_data = Message.filter_by({"recipient": user.id})
-    assert messages_data is not None
-    assert user.get_messages() == messages_data
+    assert user.id == _SOME_USER_ID
+    assert user.email == _SOME_USER_EMAIL
 
 
-def test_user_find_by_email(app):
-    user = User.autenticate("janedoe@test.com")
-
-    assert user.id == 1
-    assert user.email == "janedoe@test.com"
-
-
-def test_user_find_by_email_fails(app):
-    user = User.autenticate("nonexiting@test.com")
+def test_user_autentication_fails(app):
+    user = User.autenticate(_SOME_NON_EXISTING_EMAIL)
 
     assert user is None
