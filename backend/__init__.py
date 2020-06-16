@@ -1,3 +1,7 @@
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection as SQLiteConnection
+
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
@@ -25,3 +29,12 @@ def create_app(config_obj=Config):
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
     return app
+
+
+# init foreign keys in sqlite database
+@event.listens_for(Engine, "connect")
+def turn_on_foreign_keys(dbapi_conn, *args):
+    if isinstance(dbapi_conn, SQLiteConnection):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = 1;")
+        cursor.close()
