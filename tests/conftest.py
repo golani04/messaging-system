@@ -1,11 +1,12 @@
 import os
 import pytest
-from backend import create_app, db as mainDB
+from backend import create_app, db
 from backend.config import Config, project_path
 
 
 class TestConfig(Config):
-    DATABASE_URL = ":memory:"
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
 def get_init_data():
@@ -21,7 +22,11 @@ def app():
 
     with app.test_client() as client:
         # create demo db in memory
-        mainDB.cursor.executescript(get_init_data())
-        yield client
+        with app.app_context():
+            conn = db.engine.raw_connection()
+            cursor = conn.cursor()
+            cursor.executescript(get_init_data())
 
-    mainDB.conn.close()
+            yield client
+
+            db.drop_all()
