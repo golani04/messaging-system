@@ -5,9 +5,18 @@ from dotenv import load_dotenv
 # load env variables
 load_dotenv()
 project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-db_path = os.path.join(project_path, os.environ.get("DBNAME"))
 
 
 class Config:
-    DATABASE_URL = db_path
     SECRET_KEY = os.environ.get("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = f"sqlite:////{project_path}/{os.environ.get('DBNAME')}"
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class DevConfig(Config):
+    TEMPLATES_AUTO_RELOAD = True
+
+
+if os.environ.get("FLASK_ENV") == "development":
+    Config = DevConfig
