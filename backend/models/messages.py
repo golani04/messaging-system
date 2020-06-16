@@ -1,108 +1,88 @@
-from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime
 from time import time
 
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+
+from sqlalchemy import Boolean, Column, Integer, String, Text, ForeignKey
+from sqlalchemy.exc import SQLAlchemyError
 
 from backend import db
-from . import validate
+from .mapper import recipients
+from .validate import ValidationError
 
 
-@dataclass
-class Message:
-    subject: str
-    body: str
-    owner: int
-    created_at: int = field(default=None, metadata="If `None` means is not saved")
-    id: int = field(default=0, metadata="If `0` means is not saved")
-    is_read: bool = False
-    __tablename__: ClassVar[str] = "Messages"
-    __columns__: ClassVar[tuple] = ("id", "subject", "body", "created_at", "is_read", "owner")
+class Message(db.Model):
+    __tablename__ = "Messages"
 
-    def __post_init__(self):
-        self._validate(asdict(self))
-        self.created_at = self.convert_to_timestamp(self.created_at)
-        self.is_read = bool(self.is_read)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    subject = Column(String(128), unique=True, nullable=False)
+    body = Column(Text, nullable=False)
+    created_at = Column(Integer, default=lambda: int(time()))
+    is_read = Column(Boolean, default=False)
+    owner = Column(Integer, ForeignKey("Users.id"), index=True)
 
-    @staticmethod
-    def convert_to_timestamp(dt):
-        if dt is None:
-            return None
-
-        if isinstance(dt, str):
-            dt = datetime.fromisoformat(dt)
-
-        return int(datetime.timestamp(dt)) if isinstance(dt, datetime) else dt
-
-    @staticmethod
-    def _validate(data: Dict):
-        required_fields = {"subject", "body", "owner"}
-        validate.required_fields(required_fields, set(data))
-        validate.is_numeric([v for k, v in data.items() if k in {"id", "owner"}])
-        validate.is_datetime(data.get("created_at"))
+    sender = db.relationship("User", back_populates="messages_sent")
+    recipients = db.relationship(
+        "User",
+        secondary=recipients,
+        primaryjoin=(recipients.c.m_id == id),
+        backref=db.backref("Users"),
+    )
 
     @classmethod
     def filter_by(cls, params: Dict[str, Any] = None) -> List["Message"]:
         """Return messages based on prams, if params is None return all messages."""
+        query = cls.query
+        if params is None:
+            params = {}
 
-        class_fields = {field_.name for field_ in fields(cls)}
-        # recipient is a key in params, other values is keys in mapper table
-        mapper_fields = ("r_id", "recipient", "m_id")
+        recipient = params.pop("recipient", None)
+        query_params = [getattr(cls, k) == v for k, v in params.items() if hasattr(cls, k)]
 
-        if params and (set(params) - class_fields.union(mapper_fields)):
-            # NOTE: if someone sends non existing field, better to return empty, never knows
-            #       whose trying to harm our application
-            return []
+        if recipient is not None:
+            query = query.join(recipients, recipients.c.m_id == cls.id)
+            query_params.append(recipients.c.r_id == recipient)
 
-        if not params:
-            result = db.filter_by(cls.__tablename__, {}).fetchall()
-        else:
-            result = db.filter_by(
-                cls.__tablename__, params, "UserMessages", mapper_fields
-            ).fetchall()
-
-        return [cls(**dict(zip(cls.__columns__, item))) for item in result]
+        return query.filter(*query_params).all()
 
     @classmethod
-    def find_by_id(cls, id: str) -> Optional["Message"]:
+    def find_by_id(cls, m_id: str) -> Optional["Message"]:
         """Use filter_by to find message."""
+        # TODO: figure out how to add that message is read by recipient
 
-        message = db.filter_by(cls.__tablename__, {"id": id}).fetchone()
-        if message is None:
-            return None
-
-        message = dict(zip(cls.__columns__, message))
-        # NOTE: side effect read should not update element
-        # TODO: create a separate method to do updates
-        if not message["is_read"]:
-            message["is_read"] = True
-            db.update(cls.__tablename__, message["id"], {"is_read": True})
-        return cls(**message)
+        return cls.query.get(m_id)
 
     def create(self) -> Union["Message", str]:
         """Create a new message using db class"""
-        data = {**asdict(self), "created_at": int(time()), "is_read": int(False)}
-
-        # remove id
-        data.pop("id", None)
-        self.id = db.insert(Message.__tablename__, data)
-
-        if self.id > 0:
-            self.created_at = data["created_at"]
-            self.is_read = data["is_read"]
-        else:
-            raise validate.ValidationError("Add a new message is failed")
+        self.created_at = int(time())
+        self.is_read = False
 
     def delete(self) -> int:
-        """Delete function shoud invoke delete on db global class to remove self instance"""
-        return db.delete(self.__tablename__, self.id)
+        """Delete function shoud invoke delete"""
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise ValidationError
 
     def to_json(self):
-        data = asdict(self)
-        data["created_at"] = datetime.utcfromtimestamp(self.created_at)
         # TODO: iclude owner as User object and not only an id
 
-        return data
+        return {
+            "id": self.id,
+            "subject": self.subject,
+            "body": self.body,
+            "owner": self.owner,
+            "created_at": datetime.utcfromtimestamp(self.created_at),
+            "is_read": self.is_read,
+        }
 
     def save(self):
-        db.conn.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise ValidationError
