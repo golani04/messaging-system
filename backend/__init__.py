@@ -4,6 +4,7 @@ from sqlite3 import Connection as SQLiteConnection
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import Config
@@ -11,6 +12,7 @@ from .config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
+ma = Marshmallow()
 
 
 def create_app(config_obj=Config):
@@ -20,6 +22,7 @@ def create_app(config_obj=Config):
     # init packages
     db.init_app(app)
     jwt.init_app(app)
+    ma.init_app(app)
     # register blueprint
     # app should be instantiated before importing blueprint
     from backend.api import bp as api_bp
