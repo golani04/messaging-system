@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Messages;
 DROP TABLE IF EXISTS UserMessages;
 
+PRAGMA foreign_keys = 1;
+
 CREATE TABLE Users (id INTEGER Primary KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL);
 INSERT INTO Users (name, email, password) VALUES 
     ('Jane', 'janedoe@test.com', '$2b$12$yQ7bf11kk6W/Kca1D3H2tuvfCyJ.YihiPOANNmQGCE3ZJ8WeJpgDG'),
@@ -27,7 +29,8 @@ CREATE TABLE UserMessages (
     m_id INTEGER,
     r_id INTEGER,
     FOREIGN KEY(m_id) REFERENCES Messages(id) ON DELETE CASCADE,
-    FOREIGN KEY(r_id) REFERENCES Users(id) ON DELETE CASCADE
+    FOREIGN KEY(r_id) REFERENCES Users(id) ON DELETE CASCADE,
+    CONSTRAINT uc_mr_ids UNIQUE (m_id, r_id)
 );
 CREATE INDEX recepient_id on UserMessages (r_id);
 INSERT INTO UserMessages VALUES (1, 2), (2, 1), (3, 3), (4, 2), (5, 1);

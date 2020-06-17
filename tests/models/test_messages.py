@@ -1,90 +1,93 @@
-from dataclasses import is_dataclass
-
 import pytest
+
 from backend import db
 from backend.models import validate
+from backend.models.mapper import recipients
 from backend.models.messages import Message
+from backend.models.users import User
 
 
-def test_msg(app):
-    msg = Message("Test", "Test...", 1)
+_MESSAGES_IDS = {1, 2, 3, 4, 5}
+_SOME_USER = 2
+_SOME_MESSAGE_ID = 4
+_SOME_RECIPIENT = 1
+_MESSAGES_IDS_OF_SOME_RECIPIENT = {2, 5}
+_READ_MESSAGES_IDS_OF_SOME_RECIPIENT = {5}
 
-    assert msg.id == 0
-    assert msg.created_at is None
-    assert msg.is_read is False
+_NON_EXISTING_ID = 100_000_001
 
 
 @pytest.mark.parametrize(
-    "params, expected", [(None, 5), ({"recipient": 1}, 2), ({"recipient": 1, "is_read": False}, 1)]
+    "params, expected",
+    [
+        (None, _MESSAGES_IDS),
+        ({"recipient": _SOME_RECIPIENT}, _MESSAGES_IDS_OF_SOME_RECIPIENT),
+        ({"recipient": _SOME_RECIPIENT, "is_read": False}, _READ_MESSAGES_IDS_OF_SOME_RECIPIENT),
+    ],
 )
 def test_message_filter_by(params, expected, app):
     result = Message.filter_by(params)
-
     assert result is not None
-    assert len(result) == expected
+
+    messages_id = {message.id for message in result}
+    assert messages_id == expected
 
 
 @pytest.mark.parametrize(
-    "params, expected", [({"non_existing": 10001}, []), ({"recipient": 1001}, [])]
+    "params, expected",
+    [
+        # IF KEY is not exist in a table will be ignored, and
+        # because an autorize user search this table, incorrect key can be ignored
+        ({"non-existing-key": _NON_EXISTING_ID}, _MESSAGES_IDS),
+        ({"recipient": _NON_EXISTING_ID}, []),
+    ],
 )
 def test_message_filter_by_fails(params, expected, app):
-    assert Message.filter_by(params) == expected
+    result = Message.filter_by(params)
+    assert {message.id for message in result} == set(expected)
 
 
 def test_message_create(app):
-    msg = Message(**{"subject": "Test", "body": "Testing...", "owner": 1})
-    msg.create()
+    message = Message(**{"subject": "Test", "body": "Testing...", "owner": _SOME_USER})
+    message.create()
+    message.save()
 
-    assert is_dataclass(msg)
+    assert message.id == 6
 
 
 def test_message_create_fails(app):
-    # owner is not exist
-    non_exist_owner = 10001
-    msg = Message(**{"subject": "Test", "body": "Testing...", "owner": non_exist_owner})
+    message = Message(**{"subject": "Test", "body": "Testing...", "owner": _NON_EXISTING_ID})
 
-    with pytest.raises(validate.ValidationError) as excinfo:
-        msg.create()
-
-    assert is_dataclass(msg)
-    assert str(excinfo.value) == "Add a new message is failed"
+    with pytest.raises(validate.ValidationError):
+        message.create()
+        message.save()
 
 
 def test_message_find_by_id(app):
-    is_read, *_ = db.cursor.execute("SELECT is_read FROM Messages where id = 4").fetchone()
-    assert is_read == 0
-
-    msg = Message.find_by_id(4)
-    assert is_dataclass(msg)
-    assert msg.is_read
+    assert Message.find_by_id(_SOME_MESSAGE_ID)
 
 
 def test_message_find_by_id_fails(app):
-    non_exist_msg = 10001
-
-    assert Message.find_by_id(non_exist_msg) is None
+    assert Message.find_by_id(_NON_EXISTING_ID) is None
 
 
 def test_message_delete(app):
-    msg_id = 1
-    msg = Message.find_by_id(msg_id)
-    assert msg is not None
+    assert Message.find_by_id(_SOME_MESSAGE_ID).delete()
+    assert Message.find_by_id(_SOME_MESSAGE_ID) is None
 
+
+def test_message_delete_owner_and_recipient_is_not(app):
     # let's check that message is exists in mapper table
-    (no_msg_refs, *_) = db.cursor.execute(
-        "select COUNT(*) from UserMessages where m_id = ?", (msg_id,)
-    ).fetchone()
-    assert no_msg_refs == 1
-    assert msg.delete() == 1
+    ref = db.session.query(recipients).filter_by(m_id=_SOME_MESSAGE_ID).first()
+    recipient = ref.r_id
+    assert ref.m_id == _SOME_MESSAGE_ID
+
+    msg = Message.find_by_id(_SOME_MESSAGE_ID)
+    msg.delete()
 
     # check if deleted message also was removed from mapper table
-    (no_msg_refs, *_) = db.cursor.execute(
-        "select COUNT(*) from UserMessages where m_id = ?", (msg_id,)
-    ).fetchone()
-    assert no_msg_refs == 0
+    assert db.session.query(recipients).filter_by(m_id=_SOME_MESSAGE_ID).first() is None
 
-    (user_exists, *_) = db.cursor.execute(
-        "select COUNT(*) from Users where id = ?", (msg.owner,)
-    ).fetchone()
+    result = User.query.filter(User.id.in_([recipient, msg.owner])).all()
     # user was not affected by deleting his message
-    assert user_exists == 1
+    assert [user.id for user in result] == sorted([msg.owner, recipient])
