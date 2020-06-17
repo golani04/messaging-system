@@ -1,7 +1,7 @@
 import pytest
 
 from backend import db
-from backend.models import validate
+from backend.models.exceptions import SaveError
 from backend.models.mapper import recipients
 from backend.models.messages import Message
 from backend.models.users import User
@@ -9,7 +9,7 @@ from backend.models.users import User
 
 _MESSAGES_IDS = {1, 2, 3, 4, 5}
 _SOME_USER = 2
-_SOME_MESSAGE_ID = 4
+_SOME_MESSAGE_ID = 2
 _SOME_RECIPIENT = 1
 _MESSAGES_IDS_OF_SOME_RECIPIENT = {2, 5}
 _READ_MESSAGES_IDS_OF_SOME_RECIPIENT = {5}
@@ -48,19 +48,23 @@ def test_message_filter_by_fails(params, expected, app):
 
 
 def test_message_create(app):
-    message = Message(**{"subject": "Test", "body": "Testing...", "owner": _SOME_USER})
-    message.create()
+    message = Message.create(**{"subject": "Test", "body": "Testing...", "owner": _SOME_USER})
     message.save()
 
     assert message.id == 6
 
 
 def test_message_create_fails(app):
-    message = Message(**{"subject": "Test", "body": "Testing...", "owner": _NON_EXISTING_ID})
-
-    with pytest.raises(validate.ValidationError):
-        message.create()
+    with pytest.raises(SaveError) as excinfo:
+        message = Message.create(
+            **{"subject": "Test", "body": "Testing...", "owner": _NON_EXISTING_ID}
+        )
         message.save()
+
+    err_msg, *_ = excinfo.value.args
+    assert err_msg == {
+        "message": "Sending a message failed due to internal error. Support team is notified."
+    }
 
 
 def test_message_find_by_id(app):
@@ -72,7 +76,7 @@ def test_message_find_by_id_fails(app):
 
 
 def test_message_delete(app):
-    assert Message.find_by_id(_SOME_MESSAGE_ID).delete()
+    assert Message.find_by_id(_SOME_MESSAGE_ID).delete(User.query.get(_SOME_USER))
     assert Message.find_by_id(_SOME_MESSAGE_ID) is None
 
 
@@ -83,7 +87,7 @@ def test_message_delete_owner_and_recipient_is_not(app):
     assert ref.m_id == _SOME_MESSAGE_ID
 
     msg = Message.find_by_id(_SOME_MESSAGE_ID)
-    msg.delete()
+    msg.delete(User.query.get(_SOME_USER))
 
     # check if deleted message also was removed from mapper table
     assert db.session.query(recipients).filter_by(m_id=_SOME_MESSAGE_ID).first() is None

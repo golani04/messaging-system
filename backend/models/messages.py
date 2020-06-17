@@ -1,14 +1,14 @@
-from datetime import datetime
 from time import time
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import Boolean, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend import db
+from .exceptions import DeleteError, SaveError, ValidationError
 from .mapper import recipients
-from .validate import ValidationError
+from .users import User
 
 
 class Message(db.Model):
@@ -17,9 +17,10 @@ class Message(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     subject = Column(String(128), unique=True, nullable=False)
     body = Column(Text, nullable=False)
-    created_at = Column(Integer, default=lambda: int(time()))
+    created_at = Column(Integer, default=lambda: int(time()), nullable=False)
     is_read = Column(Boolean, default=False)
-    owner = Column(Integer, ForeignKey("Users.id"), index=True)
+    # CONSIDER: maybe I don't need this field and can delegate it to the mapper table
+    owner = Column(Integer, ForeignKey("Users.id"), nullable=False, index=True)
 
     sender = db.relationship("User", back_populates="messages_sent")
     recipients = db.relationship(
@@ -38,7 +39,6 @@ class Message(db.Model):
 
         recipient = params.pop("recipient", None)
         query_params = [getattr(cls, k) == v for k, v in params.items() if hasattr(cls, k)]
-
         if recipient is not None:
             query = query.join(recipients, recipients.c.m_id == cls.id)
             query_params.append(recipients.c.r_id == recipient)
@@ -47,37 +47,37 @@ class Message(db.Model):
 
     @classmethod
     def find_by_id(cls, m_id: str) -> Optional["Message"]:
-        """Use filter_by to find message."""
         # TODO: figure out how to add that message is read by recipient
 
         return cls.query.get(m_id)
 
-    def create(self) -> Union["Message", str]:
-        """Create a new message using db class"""
-        self.created_at = int(time())
-        self.is_read = False
+    @classmethod
+    def create(cls, subject: str, body: str, owner: int) -> "Message":
+        return cls(subject=subject, body=body, owner=owner, created_at=int(time()), is_read=False)
 
-    def delete(self) -> int:
-        """Delete function shoud invoke delete"""
+    def delete(self, user: User) -> bool:
         try:
-            db.session.delete(self)
+            if user in self.recipients:
+                self.recipients.remove(user)
+            elif self.owner == user.id:
+                db.session.delete(self)
             db.session.commit()
             return True
         except SQLAlchemyError:
+            # TODO: send email to support team or devops
             db.session.rollback()
-            raise ValidationError
-
-    def to_json(self):
-        # TODO: iclude owner as User object and not only an id
-
-        return {
-            "id": self.id,
-            "subject": self.subject,
-            "body": self.body,
-            "owner": self.owner,
-            "created_at": datetime.utcfromtimestamp(self.created_at),
-            "is_read": self.is_read,
-        }
+            raise DeleteError(
+                {
+                    "message": (
+                        "Deleting a message failed due to the internal error. "
+                        "Support team is notified."
+                    )
+                }
+            )
+        #
+        raise ValidationError(
+            {"message": "Message can be deleted only by a recipient or by a sender"}
+        )
 
     def save(self):
         try:
@@ -85,4 +85,11 @@ class Message(db.Model):
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            raise ValidationError
+            raise SaveError(
+                {
+                    "message": (
+                        "Sending a message failed due to internal error. "
+                        "Support team is notified."
+                    )
+                }
+            )
