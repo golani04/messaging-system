@@ -24,6 +24,10 @@ def not_found(message: str = "Not found") -> Dict:
     return error_response(404, message)
 
 
+def internal_error(message: str = "Internal Error") -> Dict:
+    return error_response(500, message)
+
+
 @bp.app_errorhandler(422)
 def entity_unprocessable(err):
     error = defaultdict(dict, err.data.get("messages", dict))
