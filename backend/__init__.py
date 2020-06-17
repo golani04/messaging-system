@@ -1,13 +1,16 @@
+from datetime import datetime
+
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLiteConnection
 
-from flask import Flask
+from flask import Flask, json
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import Config
+from .const import DATETIME_FORMAT
 
 
 db = SQLAlchemy()
@@ -15,7 +18,16 @@ jwt = JWTManager()
 ma = Marshmallow()
 
 
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime(DATETIME_FORMAT)
+
+        return json.JSONEncoder.default(self, obj)
+
+
 def create_app(config_obj=Config):
+    Flask.json_encoder = CustomJSONEncoder
     app = Flask(__name__)
     app.config.from_object(config_obj)
 
