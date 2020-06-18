@@ -12,6 +12,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"sqlite:////{project_path}/{os.environ.get('DBNAME')}"
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_ERROR_MESSAGE_KEY = "messages"
 
 
 class DevConfig(Config):

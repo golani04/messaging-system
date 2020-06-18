@@ -1,10 +1,15 @@
 from functools import wraps
-from flask import jsonify, request
-from flask_jwt_extended import jwt_optional, get_jwt_identity
 
-from backend import db
-from backend.models import mapper, validate
+from flask import jsonify
+from flask_jwt_extended import current_user, jwt_required
+from webargs.flaskparser import use_kwargs
+
+from backend.models.exceptions import DeleteError, SaveError, ValidationError
 from backend.models.messages import Message
+from backend.models.users import User
+
+from backend.schemas.argumets import PostMessageSchema, SearchMessagesSchema
+from backend.schemas.models import MessageSchema
 
 from . import bp, errors
 
@@ -23,58 +28,54 @@ def check_item_exists(f):
 
 
 @bp.route("/messages", methods=["POST"])
-def create_new_message():
-    json = request.get_json()
-    if not json:
-        return errors.bad_request("Missing data")
+@use_kwargs(PostMessageSchema)
+@jwt_required
+def create_new_message(recipient, subject, body="Lorem"):
+    if (recipient := User.query.get(recipient)) is None:
+        return errors.bad_request("Recipient is not found.")
 
-    # NOTE: if project has a lot of this functionalite best to use a decorator
-    required_keys = {"body", "subject", "owner", "recipient"}
-    keys = set(json)
-    if not required_keys <= keys:
-        return errors.bad_request(f"Missing keys: {required_keys - keys}")
-
-    recipient = json.pop("recipient")
     try:
-        message = Message(**json)
-        with db.conn:
-            message.create()
-            mapper.create_ref(message, recipient)
-
+        message = Message.create(subject, body, current_user.id)
+        message.recipients.append(recipient)
         message.save()
-    except validate.ValidationError as err:
-        return errors.bad_request(err.messages)
+    except SaveError as err:
+        return errors.internal_error(err.messages)
 
-    return jsonify(message.to_json()), 201
+    return MessageSchema().dump(message), 201
 
 
 @bp.route("/messages", methods=["GET"])
-@jwt_optional
-def get_messages():
-    args = request.args
-    user_id = get_jwt_identity()
+@use_kwargs(SearchMessagesSchema, location="query")
+@jwt_required
+# TODO: add user role in order to find all messages sent by the specific user. Only admin
+def get_messages(**search_params):
+    search_params.setdefault("recipient", current_user.id)
 
-    if user_id is not None:
-        args = {**args, "recipient": user_id}
+    if search_params["recipient"] != current_user.id:
+        # find my messages to the recipient
+        search_params["owner"] = current_user.id
 
-    result = Message.filter_by(args)
-    return jsonify([item.to_json() for item in result])
+    messages = Message.filter_by(search_params)
+    result = MessageSchema(many=True).dump(messages)
+
+    return jsonify(result), 200
 
 
+# TODO: using python-slugify use instead of <user_id>
+#       use slugify(messages.subject-random-number)
 @bp.route("/messages/<int:m_id>", methods=["GET"])
 @check_item_exists
+@jwt_required
 def get_message(result: Message):
-    # NOTE: this api will also set is_read to True as a side effect
-    # TODO: consider different approach
-    result.save()
-    return jsonify(result.to_json())
+    return MessageSchema().dump(result), 200
 
 
 @bp.route("/messages/<int:m_id>", methods=["DELETE"])
 @check_item_exists
+@jwt_required
 def delete_message(result: Message):
-    if result.delete():
-        result.save()
+    try:
+        result.delete(current_user)
         return jsonify(), 204
-
-    return errors.bad_request(f"Deleting item `{result.id}` was not successful.")
+    except (DeleteError, ValidationError) as err:
+        return errors.internal_error(err.messages)

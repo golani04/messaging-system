@@ -1,6 +1,6 @@
 import pytest
 from backend import db
-from backend.models import users, mapper, messages, validate
+from backend.models import users, mapper, messages, exceptions
 
 _SOME_USER_ID = 1
 _SOME_MESSAGE_ID_OF_THE_SOME_USER = 3
@@ -14,10 +14,9 @@ _NON_EXISTING_USER_ID = 100_000_001
 )
 def test_message_create_fails_using_join(sender, recipient, app):
     """Test. Once sender is non existing, once recipient non existing."""
-    message = messages.Message(subject="Test mapper", body="Testing...", owner=sender)
 
-    with pytest.raises(validate.ValidationError):
-        message.create()
+    with pytest.raises(exceptions.SaveError):
+        message = messages.Message.create(subject="Test mapper", body="Testing...", owner=sender)
         message.recipients.append(users.User.query.get(recipient))
         message.save()
 
