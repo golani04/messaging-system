@@ -4,7 +4,6 @@ from flask import jsonify
 from flask_jwt_extended import current_user, jwt_required
 from webargs.flaskparser import use_kwargs
 
-from backend import jwt
 from backend.models.exceptions import DeleteError, SaveError, ValidationError
 from backend.models.messages import Message
 from backend.models.users import User
@@ -26,12 +25,6 @@ def check_item_exists(f):
         return f(message)
 
     return wrapper
-
-
-@jwt.user_loader_callback_loader
-def load_user(identity):
-    # set current user
-    return User.query.get(identity)
 
 
 @bp.route("/messages", methods=["POST"])
@@ -68,6 +61,8 @@ def get_messages(**search_params):
     return jsonify(result), 200
 
 
+# TODO: using python-slugify use instead of <user_id>
+#       use slugify(messages.subject-random-number)
 @bp.route("/messages/<int:m_id>", methods=["GET"])
 @check_item_exists
 @jwt_required
