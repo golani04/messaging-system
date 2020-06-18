@@ -1,13 +1,17 @@
 from typing import Dict, List, Union
 
 
-class SaveError(Exception):
+class BaseError(Exception):
     messages: Union[str, List, Dict] = None
 
 
-class DeleteError(Exception):
-    messages: Union[str, List, Dict] = None
+class SaveError(BaseError):
+    pass
 
 
-class ValidationError(Exception):
-    messages: Union[str, List, Dict] = None
+class DeleteError(BaseError):
+    pass
+
+
+class ValidationError(BaseError):
+    pass
