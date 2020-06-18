@@ -23,7 +23,9 @@ def test_auth_login(app):
 def test_auth_login_fails(json, expected, app):
     response = app.post("/auth/login", json=json)
 
-    assert response.status_code == expected[0]
+    status_code, expected_messages = expected
+
+    assert response.status_code == status_code
     error = response.get_json()
 
-    assert error["messages"] == expected[1]
+    assert error["messages"] == expected_messages
