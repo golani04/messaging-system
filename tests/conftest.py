@@ -9,7 +9,7 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
-def get_init_data():
+def default_data():
     with open(os.path.join(project_path, "tables.sql")) as f:
         sql = f.read()
 
@@ -25,7 +25,7 @@ def app():
         with app.app_context():
             conn = db.engine.raw_connection()
             cursor = conn.cursor()
-            cursor.executescript(get_init_data())
+            cursor.executescript(default_data())
 
             yield client
 
