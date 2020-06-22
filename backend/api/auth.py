@@ -18,7 +18,7 @@ def admin_required(fn):
     def wrapper(*args, **kwargs):
         verify_jwt_in_request()
         if not current_user or current_user.role != UserRoles.admin:
-            return forbidden("Create or delete user can only be performed by the admin!")
+            return forbidden("Create or delete an user can only be performed by the admin!")
 
         return fn(*args, **kwargs)
 

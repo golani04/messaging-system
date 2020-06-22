@@ -16,8 +16,16 @@ def error_response(status_code: int, message: Union[str, List, Dict] = None) -> 
     return response
 
 
-def bad_request(message: str = "Bad request",) -> Dict:
+def bad_request(message: str = "Bad request") -> Dict:
     return error_response(400, message)
+
+
+def unauthorized(message: str = "Unauthorized") -> Dict:
+    return error_response(401, message)
+
+
+def forbidden(message: str = "Forbidden") -> Dict:
+    return error_response(403, message)
 
 
 def not_found(message: str = "Not found") -> Dict:
