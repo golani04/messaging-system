@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Dict
 
-from marshmallow import fields, post_dump
+from marshmallow import fields, post_dump, EXCLUDE
+from marshmallow.validate import Length
 
 from backend import ma
 from backend.models import messages, users
@@ -10,10 +11,26 @@ from backend.const import DATETIME_FORMAT
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
+    email = fields.Email(required=True)
+    password = fields.String(
+        validate=Length(min=8, error="Short password. Minimum {min} charactes."), required=True
+    )
+
+    messages_sent = fields.Nested("MessageSchema", exclude=("sender",), many=True)
+    messages_received = fields.Nested("MessageSchema", many=True)
+
+    @post_dump
+    def post_dump(self, data, *args, **kwargs):
+        if "role" in data:
+            data["role"] = users.UserRoles(data["role"]).name
+
+        return data
+
     class Meta:
         model = users.User
+        unknown = EXCLUDE
+        include_relationships = True
         load_only = ("password",)
-        include_population = True
 
 
 class MessageSchema(ma.SQLAlchemyAutoSchema):
@@ -27,7 +44,7 @@ class MessageSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
         model = messages.Message
-        load_only = ("owner",)
-        datetimeformat = DATETIME_FORMAT
         include_fk = True
-        include_population = True
+        datetimeformat = DATETIME_FORMAT
+        load_only = ("owner",)
+        dump_only = ("sender",)
