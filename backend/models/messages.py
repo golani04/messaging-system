@@ -27,7 +27,8 @@ class Message(db.Model):
         "User",
         secondary=recipients,
         primaryjoin=(recipients.c.m_id == id),
-        backref=db.backref("Users"),
+        # messages_received will be set on User model
+        backref=db.backref("messages_received", lazy="dynamic"),
     )
 
     @classmethod
