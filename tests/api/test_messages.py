@@ -132,7 +132,7 @@ def test_messages_find_by_id_missing(app):
     assert response.status_code == 404
     assert (
         response.get_json()["messages"]
-        == f"Searched message: {_SOME_NON_EXISTING_ID} is not exists."
+        == f"Message with this id: `{_SOME_NON_EXISTING_ID}` is not exists."
     )
 
 
