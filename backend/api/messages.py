@@ -1,5 +1,3 @@
-from functools import wraps
-
 from flask import jsonify
 from flask_jwt_extended import current_user, jwt_required
 from webargs.flaskparser import use_kwargs
@@ -11,27 +9,14 @@ from backend.models.users import User
 from backend.schemas.argumets import PostMessageSchema, SearchMessagesSchema
 from backend.schemas.models import MessageSchema
 
-from . import bp, errors
-
-
-def check_item_exists(f):
-    @wraps(f)
-    def wrapper(m_id: int):
-        message = Message.find_by_id(m_id)
-
-        if message is None:
-            return errors.not_found(f"Searched message: {m_id} is not exists.")
-
-        return f(message)
-
-    return wrapper
+from . import bp, errors, utils
 
 
 @bp.route("/messages", methods=["POST"])
-@use_kwargs(PostMessageSchema)
 @jwt_required
-def create_new_message(recipient, subject, body="Lorem"):
-    if (recipient := User.query.get(recipient)) is None:
+@use_kwargs(PostMessageSchema)
+def create_new_message(recipient: int, subject, body: str = "Lorem"):
+    if (recipient := User.find_by_id(recipient)) is None:
         return errors.bad_request("Recipient is not found.")
 
     try:
@@ -45,8 +30,8 @@ def create_new_message(recipient, subject, body="Lorem"):
 
 
 @bp.route("/messages", methods=["GET"])
-@use_kwargs(SearchMessagesSchema, location="query")
 @jwt_required
+@use_kwargs(SearchMessagesSchema, location="query")
 # TODO: add user role in order to find all messages sent by the specific user. Only admin
 def get_messages(**search_params):
     search_params.setdefault("recipient", current_user.id)
@@ -63,16 +48,16 @@ def get_messages(**search_params):
 
 # TODO: using python-slugify use instead of <user_id>
 #       use slugify(messages.subject-random-number)
-@bp.route("/messages/<int:m_id>", methods=["GET"])
-@check_item_exists
+@bp.route("/messages/<int:id>", methods=["GET"])
 @jwt_required
+@utils.check_item_exists(Message)
 def get_message(result: Message):
     return MessageSchema().dump(result), 200
 
 
-@bp.route("/messages/<int:m_id>", methods=["DELETE"])
-@check_item_exists
+@bp.route("/messages/<int:id>", methods=["DELETE"])
 @jwt_required
+@utils.check_item_exists(Message)
 def delete_message(result: Message):
     try:
         result.delete(current_user)

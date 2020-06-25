@@ -1,5 +1,9 @@
 .vscode
 __pycache__
 *.egg-info
-.env
 *.db-journal
+# exclude secrets
+.env
+# exclude test data
+.coverage
+htmlcov/
