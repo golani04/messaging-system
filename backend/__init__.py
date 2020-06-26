@@ -39,9 +39,11 @@ def create_app(config_obj=Config):
     # app should be instantiated before importing blueprint
     from backend.api import bp as api_bp
     from backend.auth import bp as auth_bp
+    from backend.errors import bp as errors_bp
 
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(errors_bp)
 
     return app
 
