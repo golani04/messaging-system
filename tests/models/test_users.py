@@ -1,4 +1,3 @@
-import pytest
 from typing import Dict, List
 
 from backend.models.users import User
