@@ -1,10 +1,7 @@
-from collections import defaultdict
 from typing import Dict, List, Union
 
 from flask import jsonify, Response
 from werkzeug.http import HTTP_STATUS_CODES
-
-from . import bp
 
 
 def error_response(status_code: int, message: Union[str, List, Dict] = None) -> Response:
@@ -34,12 +31,3 @@ def not_found(message: str = "Not found") -> Dict:
 
 def internal_error(message: str = "Internal Error") -> Dict:
     return error_response(500, message)
-
-
-@bp.app_errorhandler(422)
-def entity_unprocessable(err):
-    error = defaultdict(dict, err.data.get("messages", dict))
-    if json := error["json"]:
-        return error_response(400, json)
-
-    return error_response(400)
