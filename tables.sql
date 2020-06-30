@@ -6,9 +6,9 @@ PRAGMA foreign_keys = 1;
 
 CREATE TABLE Users (id INTEGER Primary KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, role INTEGER DEFAULT 2 NOT NULL);
 INSERT INTO Users (name, email, password) VALUES 
-    ('Jane', 'janedoe@test.com', '$2b$12$yQ7bf11kk6W/Kca1D3H2tuvfCyJ.YihiPOANNmQGCE3ZJ8WeJpgDG'),
-    ('John', 'johndoe@test.com', '$2b$12$OHjqXpmqsYCSvVCJYmaTtejrggRYMUOx3kZfT7HJHSnDleQK.6olC'),
-    ('Leon', 'leon@test.com', '$2b$12$Ipb9GJUZ8xpbcThGmqvL4ecM9673jKnBOs.hSkDADCD4UAZ8Foola');
+    ('Jane', 'janedoe@test.com', '$bcrypt-sha256$2b,12$PHbCkPZ7KobLyer6Qchn9.$7HcMkxCJNqggY8U5mYAYbjNnXGktwMS'),
+    ('John', 'johndoe@test.com', '$bcrypt-sha256$2b,12$s8N./4tjfSPdnd4T/LHxDu$cd3.e0MxBgMLh9YwYhuzhbDPfTZIgde'),
+    ('Leon', 'leon@test.com', '$bcrypt-sha256$2b,12$mU63npHRRa22QA2qq9t2pO$J2bx6Rak//EkRPn4n3mFUIYguwjeVJC');
 UPDATE Users SET ROLE=1 WHERE id=3;
 
 CREATE TABLE Messages (id INTEGER PRIMARY KEY AUTOINCREMENT,
