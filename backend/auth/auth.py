@@ -8,6 +8,21 @@ from backend.schemas.models import UserSchema
 from . import bp, jwt_utils
 
 
+@bp.route("/register", methods=["POST"])
+@use_kwargs(UserSchema(only=("name", "email", "password"), unknown=EXCLUDE))
+def register(name: str, email: str, password: str):
+    user = User.autenticate(email)
+    if user is not None:
+        return errors.bad_request(
+            "User with this email is already in the system. Are you trying to logged in?"
+        )
+
+    user = User.create(name, email, password)
+    user.save()
+
+    return jwt_utils.response_with_tokens(user), 201
+
+
 @bp.route("/login", methods=["POST"])
 @use_kwargs(UserSchema(only=("email", "password"), unknown=EXCLUDE))
 def login(email: str, password: str):

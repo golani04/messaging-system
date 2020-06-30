@@ -1,3 +1,5 @@
+from flask_jwt_extended import get_csrf_token
+
 import pytest
 
 
@@ -5,6 +7,9 @@ _SOME_USER_EMAIL = "janedoe@test.com"
 _SOME_USER_PASSWORD = "password"
 _SOME_NON_EXISTING_EMAIL = "nonexsting@nonexsting.com"
 _SOME_NON_EXISTING_PASSWORD = "jlasflksjadf-sadfsadf.sdaf"
+
+_SOME_USER_NAME = "Test Tester"
+_SOME_USER_NEW_EMAIL = "newuser@test.com"
 
 
 def test_auth_login(app):
@@ -43,3 +48,39 @@ def test_auth_login_fails(json, expected, app):
     error = response.get_json()
 
     assert error["messages"] == expected_messages
+
+
+def test_user_registration(app):
+    response = app.post(
+        "/auth/register",
+        json={
+            "email": _SOME_USER_NEW_EMAIL,
+            "name": _SOME_USER_NAME,
+            "password": _SOME_USER_PASSWORD,
+        },
+    )
+    assert response.status_code == 201
+
+    cookie = next(cookie for cookie in app.cookie_jar if cookie.name == "access_token_cookie")
+    access_csrf = response.get_json()["access_csrf"]
+    assert get_csrf_token(cookie.value) == access_csrf
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        (
+            {"email": _SOME_USER_EMAIL, "name": _SOME_USER_NAME, "password": _SOME_USER_PASSWORD},
+            "User with this email is already in the system. Are you trying to logged in?",
+        ),
+        (
+            {"name": _SOME_USER_NAME, "password": _SOME_USER_PASSWORD},
+            {"email": ["Missing data for required field."]},
+        ),
+    ],
+)
+def test_user_registration_fails(data, expected, app):
+    response = app.post("/auth/register", json=data)
+
+    assert response.status_code == 400
+    assert response.get_json()["messages"] == expected
