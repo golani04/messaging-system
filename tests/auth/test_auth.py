@@ -1,8 +1,9 @@
-from flask_jwt_extended import get_csrf_token
+from flask_jwt_extended import create_refresh_token, create_access_token, get_csrf_token
 
 import pytest
 
 
+_SOME_USER_ID = 1
 _SOME_USER_EMAIL = "janedoe@test.com"
 _SOME_USER_PASSWORD = "password"
 _SOME_NON_EXISTING_EMAIL = "nonexsting@nonexsting.com"
@@ -84,3 +85,20 @@ def test_user_registration_fails(data, expected, app):
 
     assert response.status_code == 400
     assert response.get_json()["messages"] == expected
+
+
+def test_refresh_token(app):
+    refresh_token = create_refresh_token(identity=_SOME_USER_ID)
+    response = app.post("/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"},)
+
+    cookie = next(cookie for cookie in app.cookie_jar if cookie.name == "access_token_cookie")
+    access_csrf = response.get_json()["access_csrf"]
+    assert access_csrf == get_csrf_token(cookie.value)
+
+
+def test_wrong_refresh_token(app):
+    wrong_token = create_access_token(identity=_SOME_USER_ID)
+    app.post("/auth/refresh", headers={"Authorization": f"Bearer {wrong_token}"})
+
+    with pytest.raises(StopIteration):
+        next(cookie for cookie in app.cookie_jar if cookie.name == "access_token_cookie")

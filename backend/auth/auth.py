@@ -1,3 +1,4 @@
+from flask_jwt_extended import current_user, jwt_refresh_token_required
 from marshmallow import EXCLUDE
 from webargs.flaskparser import use_kwargs
 
@@ -37,3 +38,9 @@ def login(email: str, password: str):
         return errors.unauthorized("The email and password did not match our records.")
 
     return jwt_utils.response_with_tokens(user), 200
+
+
+@bp.route("/refresh", methods=["POST"])
+@jwt_refresh_token_required
+def refresh_access_token():
+    return jwt_utils.refresh_access_token(current_user), 200

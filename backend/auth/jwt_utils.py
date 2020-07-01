@@ -24,3 +24,11 @@ def response_with_tokens(user: User) -> Response:
     set_refresh_cookies(response, refresh_token)
 
     return response
+
+
+def refresh_access_token(user: User) -> Response:
+    access_token = create_access_token(identity=user.id)
+    response = make_response({"access_csrf": get_csrf_token(access_token)})
+    set_access_cookies(response, access_token)
+
+    return response
