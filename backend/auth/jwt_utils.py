@@ -5,6 +5,7 @@ from flask_jwt_extended import (
     get_csrf_token,
     set_access_cookies,
     set_refresh_cookies,
+    unset_jwt_cookies,
 )
 
 from backend.models.users import User
@@ -30,5 +31,12 @@ def refresh_access_token(user: User) -> Response:
     access_token = create_access_token(identity=user.id)
     response = make_response({"access_csrf": get_csrf_token(access_token)})
     set_access_cookies(response, access_token)
+
+    return response
+
+
+def logout_user():
+    response = make_response()
+    unset_jwt_cookies(response)
 
     return response

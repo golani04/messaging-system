@@ -102,3 +102,11 @@ def test_wrong_refresh_token(app):
 
     with pytest.raises(StopIteration):
         next(cookie for cookie in app.cookie_jar if cookie.name == "access_token_cookie")
+
+
+def test_logout(app):
+    access_token = create_access_token(identity=_SOME_USER_ID)
+    response = app.post("/auth/logout", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 204
+    assert not app.cookie_jar  # cookie is empty

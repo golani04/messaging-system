@@ -1,4 +1,4 @@
-from flask_jwt_extended import current_user, jwt_refresh_token_required
+from flask_jwt_extended import current_user, jwt_refresh_token_required, jwt_required
 from marshmallow import EXCLUDE
 from webargs.flaskparser import use_kwargs
 
@@ -44,3 +44,13 @@ def login(email: str, password: str):
 @jwt_refresh_token_required
 def refresh_access_token():
     return jwt_utils.refresh_access_token(current_user), 200
+
+
+@bp.route("/logout", methods=["POST"])
+@jwt_required
+def logout():
+    return jwt_utils.logout_user(), 204
+
+
+# TODO: Blacklist tokens
+# https://github.com/vimalloc/flask-jwt-extended/tree/master/examples/database_blacklist
