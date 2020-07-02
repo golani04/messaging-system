@@ -54,3 +54,6 @@ def logout():
 
 # TODO: Blacklist tokens
 # https://github.com/vimalloc/flask-jwt-extended/tree/master/examples/database_blacklist
+
+# TODO: Forgot password
+# https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html
