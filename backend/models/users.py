@@ -1,5 +1,5 @@
 from enum import IntEnum
-from passlib.hash import bcrypt
+from passlib.hash import bcrypt_sha256
 
 from typing import Dict, List, Optional
 
@@ -28,11 +28,14 @@ class User(db.Model):
 
     @staticmethod
     def generate_passw(passw: str) -> str:
-        return bcrypt.hash(passw)
+        # bcrypt has 2 issues 1. it will quit on null byte and had maximum
+        # capicity of 72 bytes, passlib solves those issues by hashing password
+        # using sha256  algorithm and after bcrypting this hash.
+        return bcrypt_sha256.hash(passw)
 
     @staticmethod
     def verify_passw(passw: str, hashed: str) -> bool:
-        return bcrypt.verify(passw, hashed)
+        return bcrypt_sha256.verify(passw, hashed)
 
     @classmethod
     def autenticate(cls, email: str) -> Optional["User"]:

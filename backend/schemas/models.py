@@ -5,9 +5,8 @@ from marshmallow import fields, post_dump, EXCLUDE
 from marshmallow.validate import Length
 
 from backend import ma
-from backend.models import messages, users
-
 from backend.const import DATETIME_FORMAT
+from backend.models import messages, users
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
