@@ -16,6 +16,7 @@ flask-sqlalchemy = "^2.4.3"
 flask-marshmallow = "^0.13.0"
 marshmallow-sqlalchemy = "^0.23.1"
 webargs = "^6.1.0"
+secure = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

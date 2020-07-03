@@ -420,6 +420,14 @@ version = "2020.5.14"
 
 [[package]]
 category = "main"
+description = "A lightweight package that adds optional security headers and cookie attributes for Python web frameworks."
+name = "secure"
+optional = false
+python-versions = ">=3"
+version = "0.2.1"
+
+[[package]]
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -501,7 +509,7 @@ dev = ["pytest", "pytest-timeout", "coverage", "tox", "sphinx", "pallets-sphinx-
 watchdog = ["watchdog"]
 
 [metadata]
-content-hash = "037e73db2b6834278d9497fb0bc6d19855da0d2a6d468a7d98a7e4eff15389a1"
+content-hash = "91ab08e91a1cf26f24d00632fe4411ff1697a1923738a6ec028e9ab358afd540"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -764,6 +772,10 @@ regex = [
     {file = "regex-2020.5.14-cp38-cp38-win32.whl", hash = "sha256:1386e75c9d1574f6aa2e4eb5355374c8e55f9aac97e224a8a5a6abded0f9c927"},
     {file = "regex-2020.5.14-cp38-cp38-win_amd64.whl", hash = "sha256:7e61be8a2900897803c293247ef87366d5df86bf701083b6c43119c7c6c99108"},
     {file = "regex-2020.5.14.tar.gz", hash = "sha256:ce450ffbfec93821ab1fea94779a8440e10cf63819be6e176eb1973a6017aff5"},
+]
+secure = [
+    {file = "secure-0.2.1-py2-none-any.whl", hash = "sha256:b3bf1e39ebf40040fc3248392343a5052aa14cb45fc87ec91b0bd11f19cc46bd"},
+    {file = "secure-0.2.1.tar.gz", hash = "sha256:4dc8dd4b548831c3ad7f94079332c41d67c781eccc32215ff5a8a49582c1a447"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
