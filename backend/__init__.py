@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from secure import SecureCookie, SecureHeaders
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLiteConnection
@@ -16,6 +17,8 @@ from .const import DATETIME_FORMAT
 db = SQLAlchemy()
 jwt = JWTManager()
 ma = Marshmallow()
+secure_cookie = SecureCookie()
+secure_headers = SecureHeaders()
 
 
 class CustomJSONEncoder(json.JSONEncoder):
