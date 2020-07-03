@@ -3,6 +3,8 @@ from typing import Dict, List, Union
 from flask import jsonify, Response
 from werkzeug.http import HTTP_STATUS_CODES
 
+from backend import secure_headers
+
 
 def error_response(status_code: int, message: Union[str, List, Dict] = None) -> Response:
     payload = {"error": HTTP_STATUS_CODES.get(status_code, "Unknown error")}
@@ -10,6 +12,7 @@ def error_response(status_code: int, message: Union[str, List, Dict] = None) -> 
     response = jsonify(payload)
     response.status_code = status_code
 
+    secure_headers.flask(response)
     return response
 
 
