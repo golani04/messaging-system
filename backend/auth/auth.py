@@ -31,6 +31,7 @@ def login(email: str, password: str):
 
     # TODO: if email is missing, using brute force to get existing users
     #       Consider limit number of tries or show 401 error Bad email or password
+    #       Add dummy password to run verify password function to prevent timing attack
     if user is None:
         return errors.not_found("Couldn't find an account with this email.")
 
