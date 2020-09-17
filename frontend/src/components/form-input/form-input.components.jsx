@@ -1,10 +1,11 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 
-const FormInput = ({ id, label, ...props }) => (
-    <div className="group">
-        {<label class="form-input-label" htmlFor={id}>{label}</label> ? label : null}
-        <input id={id} className="form-input" {...props} />
-    </div>
+const CustomGroup = ({ id, label, ...props }) => (
+    <Form.Group>
+        {label ? <Form.Label className="form-input-label" htmlFor={id}>{label}</Form.Label> : null}
+        <Form.Control id={id} {...props} />
+    </Form.Group>
 );
 
-export default FormInput;
+export default CustomGroup;

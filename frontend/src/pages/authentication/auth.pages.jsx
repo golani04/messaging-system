@@ -7,15 +7,8 @@ import SignIn from "../../components/sign-in/sign-in.component";
 
 const SignInAndSignUpPage = () => (
     <Row>
-        <Col>
-            <div className="sign-in-and-sign-up">
-                <SignIn />
-            </div>
-        </Col>
-        <Col>
-            <div className="sign-in-and-sign-up">
-                <SignIn />
-            </div>
+        <Col md={6} className="mb-5 mb-sm-0">
+            <SignIn />
         </Col>
     </Row>
 );
