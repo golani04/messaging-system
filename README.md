@@ -13,7 +13,7 @@ Address [Messaging system](https://polar-brushlands-03833.herokuapp.com/)
   - Heroku don't support poetry. Run this command to export it
 
     ```sh
-    poetry export -f requirements.txt > requirements.txt
+    poetry export --without-hashes -f requirements.txt > requirements.txt
     ```
 
 - `heroku config:set KEY=VALUE` or add in project folder on heroku
