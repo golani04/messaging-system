@@ -29,6 +29,8 @@ class CustomJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+# TODO: consider to use flask_smorest, to use redoc and OpenAPI
+#       https://flask-smorest.readthedocs.io/en/latest
 def create_app(config_obj=Config):
     Flask.json_encoder = CustomJSONEncoder
     app = Flask(__name__)
