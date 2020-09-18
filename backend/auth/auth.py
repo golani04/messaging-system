@@ -3,10 +3,9 @@ from marshmallow import EXCLUDE
 from webargs.flaskparser import use_kwargs
 
 from backend.api import errors
+from backend.auth import bp, jwt_utils
 from backend.models.users import User
 from backend.schemas.models import UserSchema
-
-from . import bp, jwt_utils
 
 
 @bp.route("/register", methods=["POST"])

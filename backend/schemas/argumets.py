@@ -1,7 +1,8 @@
-from typing import Any, Dict, Tuple, Optional
-from marshmallow import Schema, ValidationError, fields, pre_load, EXCLUDE
+from typing import Any, Dict, Optional, Tuple
 
-from .models import MessageSchema, UserSchema
+from marshmallow import EXCLUDE, Schema, ValidationError, fields, pre_load
+
+from backend.schemas.models import MessageSchema, UserSchema
 
 
 def validate_by_defined_schema(

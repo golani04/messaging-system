@@ -1,6 +1,7 @@
 import pytest
+
 from backend import db
-from backend.models import users, mapper, messages, exceptions
+from backend.models import exceptions, mapper, messages, users
 
 _SOME_USER_ID = 1
 _SOME_MESSAGE_ID_OF_THE_SOME_USER = 3

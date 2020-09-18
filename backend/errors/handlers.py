@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from backend.api import errors
-from . import bp
+from backend.errors import bp
 
 
 @bp.app_errorhandler(422)

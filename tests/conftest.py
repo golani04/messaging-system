@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from backend import create_app, db
 from backend.config import Config, project_path
 

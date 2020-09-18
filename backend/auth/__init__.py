@@ -1,4 +1,5 @@
 from flask import Blueprint
+
 from backend import secure_headers
 
 bp = Blueprint("auth", __name__)

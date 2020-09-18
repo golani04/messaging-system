@@ -1,10 +1,10 @@
 from functools import wraps
+
 from flask_jwt_extended import current_user, verify_jwt_in_request
 
 from backend import jwt
+from backend.api.errors import forbidden
 from backend.models.users import User, UserRoles
-
-from .errors import forbidden
 
 
 @jwt.user_loader_callback_loader

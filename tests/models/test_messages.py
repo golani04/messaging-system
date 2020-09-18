@@ -6,7 +6,6 @@ from backend.models.mapper import recipients
 from backend.models.messages import Message
 from backend.models.users import User
 
-
 _MESSAGES_IDS = {1, 2, 3, 4, 5}
 _SOME_USER = 2
 _SOME_MESSAGE_ID = 2

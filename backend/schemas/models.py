@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from marshmallow import fields, post_dump, EXCLUDE
+from marshmallow import EXCLUDE, fields, post_dump
 from marshmallow.validate import Length
 
 from backend import ma

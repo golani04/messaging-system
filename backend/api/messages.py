@@ -2,14 +2,12 @@ from flask import jsonify
 from flask_jwt_extended import current_user, jwt_required
 from webargs.flaskparser import use_kwargs
 
+from backend.api import bp, errors, utils
 from backend.models.exceptions import DeleteError, SaveError, ValidationError
 from backend.models.messages import Message
 from backend.models.users import User
-
 from backend.schemas.argumets import PostMessageSchema, SearchMessagesSchema
 from backend.schemas.models import MessageSchema
-
-from . import bp, errors, utils
 
 
 @bp.route("/messages", methods=["POST"])

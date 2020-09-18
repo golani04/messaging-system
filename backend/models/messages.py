@@ -1,14 +1,13 @@
 from time import time
-
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Boolean, Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend import db
-from .exceptions import DeleteError, SaveError, ValidationError
-from .mapper import recipients
-from .users import User
+from backend.models.exceptions import DeleteError, SaveError, ValidationError
+from backend.models.mapper import recipients
+from backend.models.users import User
 
 
 class Message(db.Model):

@@ -1,15 +1,14 @@
 from flask import jsonify
-from flask_jwt_extended import jwt_required, current_user
+from flask_jwt_extended import current_user, jwt_required
 from marshmallow import EXCLUDE
 from webargs.flaskparser import use_kwargs
 
+from backend.api import bp, errors, utils
 from backend.api.auth import admin_required
-from backend.models.users import User, UserRoles
 from backend.models.exceptions import DeleteError, SaveError
-from backend.schemas.models import UserSchema
+from backend.models.users import User, UserRoles
 from backend.schemas.argumets import SearchUsersSchema
-
-from . import bp, errors, utils
+from backend.schemas.models import UserSchema
 
 
 # TODO: using python-slugify use instead of <user_id> use slugify(user.name-random-number)

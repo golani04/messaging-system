@@ -1,5 +1,6 @@
 # base on this article https://www.michaelcho.me/article/using-python-enums-in-sqlalchemy-models
 from sqlalchemy import Integer
+
 from backend import db
 
 

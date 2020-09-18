@@ -1,4 +1,5 @@
 from flask import Blueprint
+
 from backend import secure_headers
 
 bp = Blueprint("api", __name__)
@@ -12,4 +13,4 @@ def after_request(response):
 
 
 # prevent circular imports
-from . import users, messages, auth  # noqa: E402,F401
+from . import auth, messages, users  # noqa: E402,F401

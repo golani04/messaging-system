@@ -3,6 +3,7 @@ from typing import Optional
 
 from flask_jwt_extended import current_user
 from flask_sqlalchemy import DefaultMeta, Model
+
 from . import errors
 
 

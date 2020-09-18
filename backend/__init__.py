@@ -1,18 +1,16 @@
 from datetime import datetime
-
-from secure import SecureCookie, SecureHeaders
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLiteConnection
 
 from flask import Flask, json
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from secure import SecureCookie, SecureHeaders
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
-from .config import Config
-from .const import DATETIME_FORMAT
-
+from backend.config import Config
+from backend.const import DATETIME_FORMAT
 
 db = SQLAlchemy()
 jwt = JWTManager()

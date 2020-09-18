@@ -2,7 +2,6 @@ from typing import Dict, List
 
 from backend.models.users import User
 
-
 _SOME_USER_ID = 1
 _SOME_USER_EMAIL = "janedoe@test.com"
 _SENT_MESSAGES_IDS_BY_SOME_USER = {1}

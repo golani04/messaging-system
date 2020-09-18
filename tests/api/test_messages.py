@@ -1,7 +1,5 @@
 import pytest
-
 from flask_jwt_extended import create_access_token
-
 
 _SOME_USER_ID = 1
 _SOME_USER_MESSAGE_ID_AS_OWNER = 1

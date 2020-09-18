@@ -1,16 +1,14 @@
 from enum import IntEnum
-from passlib.hash import bcrypt_sha256
-
 from typing import Dict, List, Optional
 
+from passlib.hash import bcrypt_sha256
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend import db
-from .exceptions import SaveError, DeleteError
-from .mapper import recipients
-from .types_decorators import SQLAIntEnum
-
+from backend.models.exceptions import DeleteError, SaveError
+from backend.models.mapper import recipients
+from backend.models.types_decorators import SQLAIntEnum
 
 UserRoles = IntEnum("UserRoles", "admin user")
 

@@ -1,7 +1,5 @@
-from flask_jwt_extended import create_refresh_token, create_access_token, get_csrf_token
-
 import pytest
-
+from flask_jwt_extended import create_access_token, create_refresh_token, get_csrf_token
 
 _SOME_USER_ID = 1
 _SOME_USER_EMAIL = "janedoe@test.com"

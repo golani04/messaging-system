@@ -2,7 +2,6 @@ from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
 
 from backend import db
 
-
 recipients = db.Table(
     "UserMessages",
     Column("m_id", Integer, ForeignKey("Messages.id")),

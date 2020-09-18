@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 
 # load env variables
 load_dotenv()
@@ -28,5 +28,5 @@ class DevConfig(Config):
     TEMPLATES_AUTO_RELOAD = True
 
 
-if os.environ.get("FLASK_ENV") == "development":
+if os.getenv("FLASK_ENV") == "development":
     Config = DevConfig
