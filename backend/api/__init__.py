@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask_smorest.blueprint import Blueprint
 
 from backend import secure_headers
 
