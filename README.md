@@ -19,6 +19,10 @@ Address [Messaging system](https://polar-brushlands-03833.herokuapp.com/)
 - `heroku config:set KEY=VALUE` or add in project folder on heroku
   - Set all environments variables
 
+### GIT
+
+- Git log as a _graph_: `$ git log --all --decorate --oneline --graph`
+
 ## DB
 
 ### Users
