@@ -9,8 +9,17 @@ project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = f"sqlite:////{project_path}/{os.environ.get('DBNAME')}"
+    API_TITLE = "Messaging system"
+    API_VERSION = "v1"
+    OPENAPI_VERSION = "3.0.2"
+    # OPENAPI_JSON_PATH = "api-spec.json"
+    OPENAPI_URL_PREFIX = "/"
+    OPENAPI_REDOC_PATH = "redoc"
+    OPENAPI_REDOC_URL = "https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"
+    OPENAPI_SWAGGER_UI_PATH = "swagger-ui"
+    OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = f"sqlite:////{project_path}/{os.getenv('DBNAME')}"
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_ERROR_MESSAGE_KEY = "messages"
