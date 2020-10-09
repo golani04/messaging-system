@@ -75,6 +75,8 @@ class User(db.Model):
 
     def update(self, params: Dict):
         for k, v in params.items():
+            if k == "password":
+                v = self.generate_passw(v)
             setattr(self, k, v)
 
     def delete(self):
