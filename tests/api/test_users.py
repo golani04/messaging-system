@@ -47,7 +47,7 @@ def test_create_user(app):
         ),
         (
             (_SOME_NEW_EMAIL, _SHORT_PASSWORD, _SOME_ADMIN_USER_ID),
-            {"password": ["Short password. Minimum 8 charactes."]},
+            {"password": ["Short password. Minimum 8 characters."]},
         ),
         (
             (_SOME_NEW_EMAIL, _SOME_USER_PASSWORD, _SOME_USER_ID),  # 403
@@ -65,7 +65,7 @@ def test_create_user_fails(values, expected, app):
     )
 
     assert response.status_code in {400, 403}
-    assert response.get_json()["messages"] == expected
+    assert response.get_json()["errors"] == expected
 
 
 def test_get_user(app):
@@ -91,7 +91,7 @@ def test_get_user_fails(app):
 
     assert response.status_code == 404
     assert (
-        response.get_json()["messages"] == f"User with this id: `{_NON_EXISTING_ID}` is not exists."
+        response.get_json()["errors"] == f"User with this id: `{_NON_EXISTING_ID}` is not exists."
     )
 
 
@@ -104,8 +104,7 @@ def test_update_user(user_id, app):
         json={"email": _SOME_NEW_EMAIL},
     )
 
-    assert response.status_code == 200
-    assert response.get_json()["email"] == _SOME_NEW_EMAIL
+    assert response.status_code == 204
 
 
 def test_update_user_fails(app):
@@ -117,7 +116,7 @@ def test_update_user_fails(app):
     )
 
     assert response.status_code == 200
-    assert response.get_json()["id"] != _NON_EXISTING_ID
+    assert response.get_json()["errors"] == "Nothing to update missing properties"
 
 
 def test_update_user_fails_to_update_other_user(app):
@@ -125,11 +124,11 @@ def test_update_user_fails_to_update_other_user(app):
     response = app.patch(
         f"/api/users/{_SOME_OTHER_USER_ID}",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={},
+        json={"name": "Some name"},
     )
 
-    assert response.status_code == 401
-    assert response.get_json()["messages"] == "User can modify only himself."
+    assert response.status_code == 403
+    assert response.get_json()["errors"] == "User can modify only his properties."
 
 
 def test_delete_user_by_admin(app):
@@ -155,6 +154,6 @@ def test_delete_user_by_admin_fails(app):
 
     assert response.status_code == 403
     assert (
-        response.get_json()["messages"]
+        response.get_json()["errors"]
         == "Create or delete an user can only be performed by the admin!"
     )
