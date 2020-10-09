@@ -33,6 +33,13 @@ class CustomJSONEncoder(json.JSONEncoder):
 # TODO: consider to use flask_smorest, to use redoc and OpenAPI
 #       https://flask-smorest.readthedocs.io/en/latest
 def create_app(config_obj=Config):
+    # silence warning
+    import warnings
+
+    warnings.filterwarnings(
+        "ignore", message="Multiple schemas resolved to the name ", category=UserWarning
+    )
+    # init app
     Flask.json_encoder = CustomJSONEncoder
     app = Flask(__name__)
     app.config.from_object(config_obj)
