@@ -74,7 +74,7 @@ def test_messages_post_fails(json, expected, app):
     )
 
     assert response.status_code == 400
-    assert response.get_json()["messages"] == expected
+    assert response.get_json()["errors"] == expected
 
 
 @pytest.mark.parametrize(
@@ -95,7 +95,7 @@ def test_messages_post_fails(json, expected, app):
         # provide non existing values or keys
         ({"recipient": _SOME_NON_EXISTING_ID}, set()),
         # ignores this key
-        ({"non-existing-field": _SOME_NON_EXISTING_ID}, _SOME_USER_MESSAGES_IDS_AS_RECIPIENT,),
+        ({"non-existing-field": _SOME_NON_EXISTING_ID}, _SOME_USER_MESSAGES_IDS_AS_RECIPIENT),
     ],
 )
 def test_messages_by_args(params, expected, app):
@@ -128,7 +128,7 @@ def test_messages_find_by_id_missing(app):
 
     assert response.status_code == 404
     assert (
-        response.get_json()["messages"]
+        response.get_json()["errors"]
         == f"Message with this id: `{_SOME_NON_EXISTING_ID}` is not exists."
     )
 
