@@ -12,7 +12,7 @@ from backend.models import messages, users
 class UserSchema(ma.SQLAlchemyAutoSchema):
     email = fields.Email(required=True)
     password = fields.String(
-        validate=Length(min=8, error="Short password. Minimum {min} charactes."), required=True
+        validate=Length(min=8, error="Short password. Minimum {min} characters."), required=True
     )
 
     messages_sent = fields.Nested("MessageSchema", exclude=("sender",), many=True)
