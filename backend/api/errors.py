@@ -6,10 +6,9 @@ from werkzeug.http import HTTP_STATUS_CODES
 from backend import secure_headers
 
 
-def error_response(status_code: int, message: Union[str, List, Dict] = None) -> Response:
-    payload = {"error": HTTP_STATUS_CODES.get(status_code, "Unknown error")}
-    payload["messages"] = message or payload["error"]
-    response = jsonify(payload)
+def error_response(status_code: int, messages: Union[str, List, Dict] = None) -> Response:
+    error_status = HTTP_STATUS_CODES.get(status_code, "Unknown error")
+    response = jsonify({"success": False, "errors": messages or error_status})
     response.status_code = status_code
 
     secure_headers.flask(response)
