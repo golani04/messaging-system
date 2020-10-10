@@ -41,12 +41,10 @@ def test_auth_login(app):
 def test_auth_login_fails(json, expected, app):
     response = app.post("/auth/login", json=json)
 
-    status_code, expected_messages = expected
+    status_code, error = expected
 
     assert response.status_code == status_code
-    error = response.get_json()
-
-    assert error["messages"] == expected_messages
+    assert response.get_json()["errors"] == error
 
 
 def test_user_registration(app):
@@ -82,7 +80,7 @@ def test_user_registration_fails(data, expected, app):
     response = app.post("/auth/register", json=data)
 
     assert response.status_code == 400
-    assert response.get_json()["messages"] == expected
+    assert response.get_json()["errors"] == expected
 
 
 def test_refresh_token(app):
@@ -96,7 +94,10 @@ def test_refresh_token(app):
 
 def test_wrong_refresh_token(app):
     wrong_token = create_access_token(identity=_SOME_USER_ID)
-    app.post("/auth/refresh", headers={"Authorization": f"Bearer {wrong_token}"})
+    response = app.post("/auth/refresh", headers={"Authorization": f"Bearer {wrong_token}"})
+
+    assert response.status_code == 401
+    assert response.get_json()["errors"] == "Unathorized"
 
     with pytest.raises(StopIteration):
         next(cookie for cookie in app.cookie_jar if cookie.name == "access_token_cookie")
