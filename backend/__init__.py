@@ -56,7 +56,7 @@ def create_app(config_obj=Config):
     from backend.errors import bp as errors_bp
 
     api_app.register_blueprint(api_bp, url_prefix="/api")
-    app.register_blueprint(auth_bp, url_prefix="/auth")
+    api_app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(errors_bp)
 
     return app
