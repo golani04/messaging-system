@@ -47,3 +47,15 @@ class SearchUsersSchema(Schema):
     class Meta:
         unknown = EXCLUDE
         additonal = ("name", "email")
+
+
+# Schemas to auto generate docs
+CreateUserSchema = Schema.from_dict(
+    {k: v for k, v in UserSchema().declared_fields.items() if k in ("name", "email", "password")},
+    name="CreateUserSchema",
+)
+
+LoginSchema = Schema.from_dict(
+    {k: v for k, v in UserSchema().declared_fields.items() if k in ("email", "password")},
+    name="LoginSchema",
+)
