@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 from marshmallow import EXCLUDE, Schema, ValidationError, fields, pre_load
+from marshmallow.validate import Length
 
 from backend.schemas.models import MessageSchema, UserSchema
 
@@ -50,12 +51,22 @@ class SearchUsersSchema(Schema):
 
 
 # Schemas to auto generate docs
-CreateUserSchema = Schema.from_dict(
-    {k: v for k, v in UserSchema().declared_fields.items() if k in ("name", "email", "password")},
-    name="CreateUserSchema",
-)
+class CreateUserSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
 
-LoginSchema = Schema.from_dict(
-    {k: v for k, v in UserSchema().declared_fields.items() if k in ("email", "password")},
-    name="LoginSchema",
-)
+    name = fields.String(required=True)
+    email = fields.Email(required=True)
+    password = fields.String(
+        validate=Length(min=8, error="Short password. Minimum {min} characters."), required=True,
+    )
+
+
+class LoginSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    email = fields.Email(required=True)
+    password = fields.String(
+        validate=Length(min=8, error="Short password. Minimum {min} characters."), required=True,
+    )
