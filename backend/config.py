@@ -22,7 +22,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"sqlite:////{project_path}/{os.getenv('DBNAME')}"
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_ERROR_MESSAGE_KEY = "messages"
+    JWT_ERROR_MESSAGE_KEY = "errors"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     JWT_TOKEN_LOCATION = ["cookies"]

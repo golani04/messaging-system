@@ -6,7 +6,7 @@ Address [Messaging system](https://polar-brushlands-03833.herokuapp.com/)
 
 ### Requirements
 
-- I chose to us **gunicorn** with heroku
+- **gunicorn** will run with heroku
 - runtime.txt: Specify python version
 - Procfile: Call command to up a server
 - requirements.txt: Show which app to install
@@ -67,3 +67,10 @@ Postman: Call first /auth/login route it will save token and then call /api/mess
   - [x] DELETE /api/messages/<m\_id>
 
 **NOTE**: All messages are returned by recipient not by owner if recipient provided or user_id.
+
+## TESTS
+
+### Coverage
+
+- Run tests using coverage: `poetry run coverage run`
+- Output coverage to html: `poetry run coverage html`

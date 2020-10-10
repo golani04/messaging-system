@@ -72,6 +72,19 @@ def test_user_update(app):
     assert user.name == _UPDATED_NAME
 
 
+def test_user_update_password(app):
+    user = User.find_by_id(_SOME_USER_ID)
+    current_hash = user.password
+    some_pass = "123456"
+
+    user.update({"password": some_pass})
+    user.save()
+
+    user = User.find_by_id(_SOME_USER_ID)
+    assert user.password != current_hash
+    assert user.verify_passw(some_pass, user.password)
+
+
 def test_user_delete(app):
     user = User.find_by_id(_SOME_USER_ID)
     assert user.delete()

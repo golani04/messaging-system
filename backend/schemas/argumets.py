@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 from marshmallow import EXCLUDE, Schema, ValidationError, fields, pre_load
+from marshmallow.validate import Length
 
 from backend.schemas.models import MessageSchema, UserSchema
 
@@ -47,3 +48,25 @@ class SearchUsersSchema(Schema):
     class Meta:
         unknown = EXCLUDE
         additonal = ("name", "email")
+
+
+# Schemas to auto generate docs
+class CreateUserSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    name = fields.String(required=True)
+    email = fields.Email(required=True)
+    password = fields.String(
+        validate=Length(min=8, error="Short password. Minimum {min} characters."), required=True,
+    )
+
+
+class LoginSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    email = fields.Email(required=True)
+    password = fields.String(
+        validate=Length(min=8, error="Short password. Minimum {min} characters."), required=True,
+    )

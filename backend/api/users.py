@@ -4,7 +4,7 @@ from backend.api import bp, errors, utils
 from backend.api.auth import admin_required
 from backend.models.exceptions import DeleteError, SaveError
 from backend.models.users import User, UserRoles
-from backend.schemas.argumets import SearchUsersSchema
+from backend.schemas.argumets import CreateUserSchema, SearchUsersSchema
 from backend.schemas.error import DefaultErrorSchema, ValidationErrorSchema
 from backend.schemas.models import UserSchema
 
@@ -13,7 +13,7 @@ from backend.schemas.models import UserSchema
 @bp.route("/users", methods=["GET"])
 @bp.arguments(schema=SearchUsersSchema, location="query", as_kwargs=True)
 @bp.response(
-    schema=UserSchema(many=True, only=("id", "name", "email", "role")),
+    schema=UserSchema(many=True, exclude=("password", "messages_sent", "messages_received")),
     code=200,
     description="Return users",
 )
@@ -22,7 +22,9 @@ from backend.schemas.models import UserSchema
     description="Return users or search by some values",
     responses={
         "200": {
-            "schema": UserSchema(many=True, only=("id", "name", "email", "role")),
+            "schema": UserSchema(
+                many=True, exclude=("password", "messages_sent", "messages_received")
+            ),
             "description": "Return users",
         },
         "400": {
@@ -44,13 +46,9 @@ def get_users(**search_params):
 
 
 @bp.route("/users", methods=["POST"])
-@bp.arguments(
-    schema=UserSchema(only=("name", "email", "password")),
-    description="Create a new user",
-    as_kwargs=True,
-)
+@bp.arguments(schema=CreateUserSchema, description="Create a new user", as_kwargs=True)
 @bp.response(
-    schema=UserSchema(only=("id", "name", "email", "role")),
+    schema=UserSchema(exclude=("password", "messages_sent", "messages_received")),
     code=201,
     description="Return a new user",
 )
@@ -59,7 +57,7 @@ def get_users(**search_params):
     description="Create a new user, admin action.",
     responses={
         "201": {
-            "schema": UserSchema(only=("id", "name", "email", "role")),
+            "schema": UserSchema(exclude=("password", "messages_sent", "messages_received")),
             "description": "Return a new user",
         },
         "400": {"schema": ValidationErrorSchema, "description": "Incorrect types "},
@@ -83,7 +81,7 @@ def create_user(name, email, password: str):
 
 @bp.route("/users/<int:id>", methods=["GET"])
 @bp.response(
-    schema=UserSchema(exclude=("messages_sent", "messages_received")),
+    schema=UserSchema(exclude=("password", "messages_sent", "messages_received")),
     code=200,
     description="Using an id get the user",
 )
@@ -92,7 +90,7 @@ def create_user(name, email, password: str):
     description="Return a user by id",
     responses={
         "200": {
-            "schema": UserSchema(exclude=("messages_sent", "messages_received")),
+            "schema": UserSchema(exclude=("password", "messages_sent", "messages_received")),
             "description": "User is found",
         },
         "401": {"schema": DefaultErrorSchema, "description": "Wrong credentials"},
@@ -113,7 +111,7 @@ def get_user(user: User):
 
 
 @bp.route("/users/<int:id>", methods=["PATCH"])
-@bp.arguments(schema=UserSchema(only=("name", "email", "password"), partial=True), as_kwargs=True)
+@bp.arguments(schema=CreateUserSchema(partial=True), as_kwargs=True)
 @bp.response(code=204, description="User successfully updated")
 @bp.doc(
     summary="Update a user properties",
