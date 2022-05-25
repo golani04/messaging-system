@@ -15,7 +15,7 @@ marshmallow==3.8.0
 marshmallow-sqlalchemy==0.23.1
 passlib==1.7.2
 pycparser==2.20
-pyjwt==1.7.1
+pyjwt==2.4.0
 python-dotenv==0.13.0
 secure==0.2.1
 six==1.15.0
